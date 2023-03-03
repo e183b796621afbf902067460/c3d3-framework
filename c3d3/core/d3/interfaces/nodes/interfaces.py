@@ -71,9 +71,9 @@ class iCBN(ABC):
         def connect(self) -> "iCBN.Builder":
             protocol = self._options.get(self.__PROTOCOL_KEY)
             if protocol in ('http', 'https'):
-                http = HTTPProvider(endpoint_uri=self._options.get(self.__URI_KEY))
-                if http.isConnected():
-                    self._options[self.__PROVIDER_KEY] = http
+                provider = HTTPProvider(endpoint_uri=self._options.get(self.__URI_KEY))
+                if provider.isConnected():
+                    self._options[self.__PROVIDER_KEY] = provider
                 else:
                     raise CannotHandleRequest("HTTP provider is down.")
             if protocol in ('wss', 'websocket'):
