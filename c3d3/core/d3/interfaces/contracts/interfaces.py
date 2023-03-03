@@ -12,6 +12,8 @@ from c3d3.core.d3.typings.nodes.typings import NodeType
 class iCBC(ABC):
     _ABI: str = None
 
+    __ADDRESS_KEY, __NODE_KEY, __ABI_KEY = 'address', 'node', 'abi'
+
     def __init__(self, address: str, node: Generic[NodeType]) -> None:
         self._address, self._node = address, node
 
@@ -24,9 +26,9 @@ class iCBC(ABC):
     @contract.setter
     def contract(self, *args, **kwargs) -> None:
         self._contract = self.builder\
-            .build(key='address', value=self._address)\
-            .build(key='node', value=self._node)\
-            .build(key='abi', value=self._ABI)\
+            .build(key=self.__ADDRESS_KEY, value=self._address)\
+            .build(key=self.__NODE_KEY, value=self._node)\
+            .build(key=self.__ABI_KEY, value=self._ABI)\
             .preprocess()\
             .construct()
 
@@ -39,8 +41,10 @@ class iCBC(ABC):
         return self.node.provider
 
     class Builder:
-        def __init__(self) -> None:
+        def __init__(self, *args, **kwargs) -> None:
             self._options: Dict[str, Any] = dict()
+
+            self.__ADDRESS_KEY, self.__NODE_KEY, self.__ABI_KEY = args
 
         @overload
         def build(self, params: Dict[str, Any]) -> "iCBC.Builder":
@@ -59,13 +63,13 @@ class iCBC(ABC):
         ) -> "iCBC.Builder":
 
             def validate(k: str, v: Any) -> None:
-                if k == 'address':
+                if k == self.__ADDRESS_KEY:
                     if not Web3.isAddress(value=v):
                         raise ValidationError("Invalid address.")
-                elif k == 'node':
+                elif k == self.__NODE_KEY:
                     if not v.provider.isConnected():
                         raise CannotHandleRequest("Node is unhealthy.")
-                elif k == 'abi':
+                elif k == self.__ABI_KEY:
                     if not isinstance(v, str):
                         raise TypeError(f'Invalid ABI type: {type(v)}.')
 
@@ -80,16 +84,16 @@ class iCBC(ABC):
 
         @final
         def preprocess(self) -> "iCBC.Builder":
-            if self._options.get('address'):
-                self._options['address'] = Web3.toChecksumAddress(value=self._options.get('address'))
+            if self._options.get(self.__ADDRESS_KEY):
+                self._options[self.__ADDRESS_KEY] = Web3.toChecksumAddress(value=self._options.get(self.__ADDRESS_KEY))
             return self
 
         @final
         def construct(self) -> Eth.contract:
-            return Web3(provider=self._options['node'].provider)\
+            return Web3(provider=self._options[self.__NODE_KEY].provider)\
                 .eth\
-                .contract(address=self._options['address'], abi=self._options['abi'])
+                .contract(address=self._options[self.__ADDRESS_KEY], abi=self._options[self.__ABI_KEY])
 
     @property
     def builder(self) -> Builder:
-        return self.Builder()
+        return self.Builder(self.__ADDRESS_KEY, self.__NODE_KEY, self.__ABI_KEY)

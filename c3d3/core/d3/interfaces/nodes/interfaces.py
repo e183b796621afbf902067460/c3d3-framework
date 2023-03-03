@@ -9,6 +9,8 @@ from web3.exceptions import ValidationError, CannotHandleRequest
 
 class iCBN(ABC):
 
+    __PROTOCOL_KEY, __URI_KEY, __PROVIDER_KEY = 'protocol', 'uri', 'provider'
+
     def __init__(self, protocol: str, uri: str) -> None:
         self._uri, self._protocol = uri, protocol
 
@@ -21,14 +23,16 @@ class iCBN(ABC):
     @provider.setter
     def provider(self, *args, **kwargs) -> None:
         self._provider = self.builder\
-            .build(key='protocol', value=self._protocol)\
-            .build(key='uri', value=self._uri)\
+            .build(key=self.__PROTOCOL_KEY, value=self._protocol)\
+            .build(key=self.__URI_KEY, value=self._uri)\
             .connect()\
             .construct()
 
     class Builder:
-        def __init__(self) -> None:
+        def __init__(self, *args, **kwargs) -> None:
             self._options: Dict[str, Any] = dict()
+
+            self.__PROTOCOL_KEY, self.__URI_KEY, self.__PROVIDER_KEY = args
 
         @overload
         def build(self, params: Dict[str, Any]) -> "iCBN.Builder":
@@ -47,10 +51,10 @@ class iCBN(ABC):
         ) -> "iCBN.Builder":
 
             def validate(k: str, v: str) -> None:
-                if k == 'protocol':
+                if k == self.__PROTOCOL_KEY:
                     if v.lower() not in ('http', 'https', 'websocket', 'wss'):
                         raise ValidationError("Invalid protocol.")
-                elif k == 'uri':
+                elif k == self.__URI_KEY:
                     if parse.urlparse(v).scheme not in ('https', 'http', 'wss'):
                         raise ValidationError("Invalid uri.")
 
@@ -65,11 +69,11 @@ class iCBN(ABC):
 
         @final
         def connect(self) -> "iCBN.Builder":
-            protocol = self._options.get('protocol')
+            protocol = self._options.get(self.__PROTOCOL_KEY)
             if protocol in ('http', 'https'):
-                http = HTTPProvider(endpoint_uri=self._options.get('uri'))
+                http = HTTPProvider(endpoint_uri=self._options.get(self.__URI_KEY))
                 if http.isConnected():
-                    self._options['provider'] = http
+                    self._options[self.__PROVIDER_KEY] = http
                 else:
                     raise CannotHandleRequest("HTTP provider is down.")
             if protocol in ('wss', 'websocket'):
@@ -78,8 +82,8 @@ class iCBN(ABC):
 
         @final
         def construct(self) -> BaseProvider:
-            return self._options['provider']
+            return self._options[self.__PROVIDER_KEY]
 
     @property
     def builder(self) -> Builder:
-        return self.Builder()
+        return self.Builder(self.__PROTOCOL_KEY, self.__URI_KEY, self.__PROVIDER_KEY)
