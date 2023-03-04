@@ -40,7 +40,7 @@ class iCBE(ABC):
             return r.delete(self.endpoint + url, data=params, headers=headers, proxies=self._proxies)
         elif method == self.__PUT:
             return r.put(self.endpoint + url, data=params, headers=headers, proxies=self._proxies)
-        raise ConnectionError('Wrong method')
+        raise ConnectionError('Wrong method.')
 
     @property
     def endpoint(self) -> str:
