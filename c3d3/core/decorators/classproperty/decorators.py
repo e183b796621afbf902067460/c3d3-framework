@@ -1,4 +1,4 @@
-import os
+from functools import wraps
 
 
 class ClassPropertyDescriptor(object):
