@@ -23,6 +23,10 @@ class iCBC(ABC):
     def contract(self) -> Eth.contract:
         return self._contract
 
+    @property
+    def address(self) -> str:
+        return self.contract.address
+
     @contract.setter
     def contract(self, *args, **kwargs) -> None:
         self._contract = self.builder\
