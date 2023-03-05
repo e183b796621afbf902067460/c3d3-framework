@@ -3,8 +3,10 @@ import time
 
 from c3d3.infrastructure.trad3r.interfaces.leaf.interface import iTraderLeaf
 from c3d3.domain.c3.wrappers.coingecko.v3.wrapper import CoinGeckoV3Exchange
+from c3d3.core.decorators.singleton.decorator import singleton
 
 
+@singleton
 class CoinGeckoV3TraderLeaf(iTraderLeaf, CoinGeckoV3Exchange):
 
     _PEGS = {
@@ -33,3 +35,6 @@ class CoinGeckoV3TraderLeaf(iTraderLeaf, CoinGeckoV3Exchange):
             time.sleep(self.__SLEEP)
             response = self.simplePrice(ids=a, vs_currencies=b)
         return response.json()[a][b]
+
+
+CoinGeckoV3TraderLeaf = CoinGeckoV3TraderLeaf()

@@ -2,8 +2,10 @@ from typing import Optional
 
 from c3d3.infrastructure.trad3r.interfaces.leaf.interface import iTraderLeaf
 from c3d3.domain.c3.wrappers.binance.spot.wrapper import BinanceSpotExchange
+from c3d3.core.decorators.singleton.decorator import singleton
 
 
+@singleton
 class BinanceSpotTraderLeaf(iTraderLeaf, BinanceSpotExchange):
 
     _PEGS = {
@@ -24,3 +26,6 @@ class BinanceSpotTraderLeaf(iTraderLeaf, BinanceSpotExchange):
     def get_price(self, a: str, b: str, *args, **kwargs) -> Optional[float]:
         a, b = self._peg(symbol=a), 'USDT' if b == 'USD' else b
         return float(self.tickerPrice(symbol=a + b).json()['price'])
+
+
+BinanceSpotTraderLeaf = BinanceSpotTraderLeaf()
