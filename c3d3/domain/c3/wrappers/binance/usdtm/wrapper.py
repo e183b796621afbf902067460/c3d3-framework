@@ -18,7 +18,7 @@ class BinanceUSDTmExchange(iCBE):
     def __header(self) -> dict:
         return {self.__X_MBX_KEY: self.api_key}
 
-    def tickerPrice(self, symbol: Optional[str], symbols: Optional[List[str]]) -> dict:
+    def tickerPrice(self, symbol: Optional[str] = None, symbols: Optional[List[str]] = None) -> dict:
         params: dict = {'symbol': symbol} if symbol else {'symbols': symbols}
         return self._r(method=self._GET, url='/fapi/v1/ticker/price', params=params).json()
 

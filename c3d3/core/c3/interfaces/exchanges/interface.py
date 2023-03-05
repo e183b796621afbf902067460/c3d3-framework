@@ -1,5 +1,6 @@
 from typing import Dict, Any, Optional, overload, final
 from abc import ABC
+import builtins
 
 import requests as r
 
@@ -63,10 +64,13 @@ class iCBE(ABC):
         return r.status_code == 200
 
     class Builder:
+
+        __TIMEOUT: int = 16
+
         def __init__(self, *args, **kwargs) -> None:
             self._options: Dict[str, Any] = dict()
 
-            self.__ENDPOINT_KEY, self.__API_KEY, self.__SECRET_KEY, self.__HEARTBEAT_KEY = args
+            self.cls, self.__ENDPOINT_KEY, self.__API_KEY, self.__SECRET_KEY, self.__HEARTBEAT_KEY = args
 
         @overload
         def build(self, params: Dict[str, Any]) -> "iCBE.Builder":
@@ -113,13 +117,13 @@ class iCBE(ABC):
 
         def connect(self):
             try:
-                status = r.get(self._options[self.__ENDPOINT_KEY] + self._options[self.__HEARTBEAT_KEY]).status_code
+                status = r.get(self._options[self.__ENDPOINT_KEY] + self._options[self.__HEARTBEAT_KEY], timeout=self.__TIMEOUT).status_code
             except KeyError:
                 raise TypeError('Set valid ping or endpoint parameter.')
-            if status != 200:
-                raise r.HTTPError('Provider is down.')
+            except r.ConnectionError:
+                builtins.print(f'Broken {self.__init__.__name__} in {self.cls.__class__.__name__}.')
             return self
 
     @property
     def builder(self):
-        return self.Builder(self.__ENDPOINT_KEY, self.__API_KEY, self.__SECRET_KEY, self.__HEARTBEAT_KEY)
+        return self.Builder(self, self.__ENDPOINT_KEY, self.__API_KEY, self.__SECRET_KEY, self.__HEARTBEAT_KEY)

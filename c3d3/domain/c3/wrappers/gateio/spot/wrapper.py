@@ -10,7 +10,7 @@ class GateIOSpotExchange(iCBE):
             self,
             currency_pair: Optional[str] = None,
             timezone: Optional[str] = None
-    ) -> dict:
+    ) -> list:
         params = dict()
         if currency_pair:
             params.update({'currency_pair': currency_pair})
