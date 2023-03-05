@@ -6,6 +6,9 @@ from c3d3.core.decorators.camel2snake.decorator import camel2snake
 
 class Polygon:
 
+    BLOCK_LIMIT = 3000
+    NATIVE_TOKEN = 'MATIC'
+
     def __str__(self) -> str:
         return __class__.__name__
 
