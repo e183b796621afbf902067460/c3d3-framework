@@ -6,7 +6,7 @@ from web3.eth import Eth
 from web3.exceptions import ValidationError, CannotHandleRequest
 from web3.providers.base import BaseProvider
 
-from c3d3.core.d3.typings.nodes.typings import NodeType
+from c3d3.core.d3.typings.nodes.typing import NodeType
 
 
 class iCBC(ABC):

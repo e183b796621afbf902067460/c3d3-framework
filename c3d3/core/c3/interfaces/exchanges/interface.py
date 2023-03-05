@@ -8,7 +8,7 @@ class iCBE(ABC):
     _ENDPOINT, _HEARTBEAT = None, None
 
     __ENDPOINT_KEY, __API_KEY, __SECRET_KEY, __HEARTBEAT_KEY, __PROXIES_KEY = 'endpoint', 'api_key', 'secret_key', 'heartbeat_endpoint', 'proxies'
-    __GET, __POST, __DELETE, __PUT = 'get', 'post', 'delete', 'put'
+    _GET, _POST, _DELETE, _PUT = 'get', 'post', 'delete', 'put'
 
     def __init__(self, api: Optional[str] = None, secret: Optional[str] = None, *args, **kwargs) -> None:
         self._api_key, self._secret_key = api, secret
@@ -32,13 +32,13 @@ class iCBE(ABC):
             params: Optional[dict] = None,
             headers: Optional[dict] = None
     ):
-        if method == self.__GET:
+        if method == self._GET:
             return r.get(self.endpoint + url, params=params, headers=headers, proxies=self._proxies)
-        elif method == self.__POST:
+        elif method == self._POST:
             return r.post(self.endpoint + url, data=params, headers=headers, proxies=self._proxies)
-        elif method == self.__DELETE:
+        elif method == self._DELETE:
             return r.delete(self.endpoint + url, data=params, headers=headers, proxies=self._proxies)
-        elif method == self.__PUT:
+        elif method == self._PUT:
             return r.put(self.endpoint + url, data=params, headers=headers, proxies=self._proxies)
         raise ConnectionError('Wrong method.')
 
