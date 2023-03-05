@@ -2,6 +2,7 @@ from typing import Optional, List
 import hmac
 import hashlib
 from urllib.parse import urlencode
+from requests import Response
 
 from c3d3.core.c3.interfaces.exchanges.interface import iCBE
 from c3d3.core.decorators.permission.decorator import permission
@@ -18,9 +19,9 @@ class BinanceSpotExchange(iCBE):
     def _header(self) -> dict:
         return {self._X_MBX_KEY: self.api_key}
 
-    def tickerPrice(self, symbol: Optional[str] = None, symbols: Optional[List[str]] = None) -> dict:
+    def tickerPrice(self, symbol: Optional[str] = None, symbols: Optional[List[str]] = None) -> Response:
         params: dict = {'symbol': symbol} if symbol else {'symbols': symbols}
-        return self._r(method=self._GET, url='/api/v3/ticker/price', params=params).json()
+        return self._r(method=self._GET, url='/api/v3/ticker/price', params=params)
 
     def aggTrades(
             self,
@@ -29,7 +30,7 @@ class BinanceSpotExchange(iCBE):
             startTime: Optional[int] = None,
             endTime: Optional[int] = None,
             limit: Optional[int] = None
-    ) -> dict:
+    ) -> Response:
         params: dict = {
             'symbol': symbol,
             'fromId': fromId,
@@ -37,14 +38,14 @@ class BinanceSpotExchange(iCBE):
             'endTime': endTime,
             'limit': limit
         }
-        return self._r(method=self._GET, url='/api/v3/aggTrades', params=params).json()
+        return self._r(method=self._GET, url='/api/v3/aggTrades', params=params)
 
     @permission
     def account(
             self,
             timestamp: int,
             recvWindow: Optional[int] = None
-    ) -> dict:
+    ) -> Response:
         params: dict = {'timestamp': timestamp} if recvWindow is None else {'timestamp': timestamp, 'recvWindow': recvWindow}
         params.update({'signature': self._signature(params)})
 
@@ -53,4 +54,4 @@ class BinanceSpotExchange(iCBE):
             url='/api/v3/account',
             params=params,
             headers=self._header()
-        ).json()
+        )

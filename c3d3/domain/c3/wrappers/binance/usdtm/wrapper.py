@@ -1,4 +1,5 @@
 from typing import Optional, List
+from requests import Response
 
 from c3d3.domain.c3.wrappers.binance.spot.wrapper import BinanceSpotExchange
 from c3d3.core.decorators.permission.decorator import permission
@@ -7,9 +8,9 @@ from c3d3.core.decorators.permission.decorator import permission
 class BinanceUsdtmExchange(BinanceSpotExchange):
     _ENDPOINT, _HEARTBEAT = 'https://fapi.binance.com', '/fapi/v1/ping'
 
-    def tickerPrice(self, symbol: Optional[str] = None, symbols: Optional[List[str]] = None) -> dict:
+    def tickerPrice(self, symbol: Optional[str] = None, symbols: Optional[List[str]] = None) -> Response:
         params: dict = {'symbol': symbol} if symbol else {'symbols': symbols}
-        return self._r(method=self._GET, url='/fapi/v1/ticker/price', params=params).json()
+        return self._r(method=self._GET, url='/fapi/v1/ticker/price', params=params)
 
     def aggTrades(
             self,
@@ -18,7 +19,7 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
             startTime: Optional[int] = None,
             endTime: Optional[int] = None,
             limit: Optional[int] = None
-    ) -> dict:
+    ) -> Response:
         params: dict = {
             'symbol': symbol,
             'fromId': fromId,
@@ -26,14 +27,14 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
             'endTime': endTime,
             'limit': limit
         }
-        return self._r(method=self._GET, url='/fapi/v1/aggTrades', params=params).json()
+        return self._r(method=self._GET, url='/fapi/v1/aggTrades', params=params)
 
     @permission
     def account(
             self,
             timestamp: int,
             recvWindow: Optional[int] = None
-    ) -> dict:
+    ) -> Response:
         params: dict = {'timestamp': timestamp} if recvWindow is None else {'timestamp': timestamp, 'recvWindow': recvWindow}
         params.update({'signature': self._signature(params)})
 
@@ -42,7 +43,7 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
             url='/fapi/v2/account',
             params=params,
             headers=self._header()
-        ).json()
+        )
 
     @permission
     def positionRisk(
@@ -50,7 +51,7 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
             timestamp: int,
             symbol: Optional[str] = None,
             recvWindow: Optional[int] = None
-    ) -> dict:
+    ) -> Response:
         params: dict = {'timestamp': timestamp}
         if symbol:
             params.update({'symbol': symbol})
@@ -63,7 +64,7 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
             url='/fapi/v2/positionRisk',
             params=params,
             headers=self._header()
-        ).json()
+        )
 
     @permission
     def openOrders(
@@ -71,7 +72,7 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
             timestamp: int,
             symbol: Optional[str] = None,
             recvWindow: Optional[int] = None
-    ) -> dict:
+    ) -> Response:
         params: dict = {
             'timestamp': timestamp
         }
@@ -86,4 +87,4 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
             url='/fapi/v1/openOrders',
             params=params,
             headers=self._header()
-        ).json()
+        )

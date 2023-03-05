@@ -1,10 +1,11 @@
 from typing import Optional
+from requests import Response
 
 from c3d3.core.c3.interfaces.exchanges.interface import iCBE
 
 
 class CoinGeckoV3Exchange(iCBE):
-    _ENDPOINT, _HEARTBEAT = "https://api.coingecko.com", '/ping'
+    _ENDPOINT, _HEARTBEAT = "https://api.coingecko.com", '/api/v3/ping'
 
     def simplePrice(
             self,
@@ -15,7 +16,7 @@ class CoinGeckoV3Exchange(iCBE):
             include_24hr_change: Optional[bool] = None,
             include_last_updated_at: Optional[bool] = None,
             precision: Optional[int] = None
-            ) -> dict:
+            ) -> Response:
         params: dict = {
             'ids': ids,
             'vs_currencies': vs_currencies
@@ -32,6 +33,6 @@ class CoinGeckoV3Exchange(iCBE):
             params.update({'precision': precision})
         return self._r(
             method=self._GET,
-            url='/simple/price',
+            url='/api/v3/simple/price',
             params=params
-        ).json()
+        )

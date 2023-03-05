@@ -1,4 +1,5 @@
 from typing import Optional
+from requests import Response
 
 from c3d3.core.c3.interfaces.exchanges.interface import iCBE
 
@@ -10,7 +11,7 @@ class GateIOSpotExchange(iCBE):
             self,
             currency_pair: Optional[str] = None,
             timezone: Optional[str] = None
-    ) -> list:
+    ) -> Response:
         params = dict()
         if currency_pair:
             params.update({'currency_pair': currency_pair})
@@ -20,4 +21,4 @@ class GateIOSpotExchange(iCBE):
             method=self._GET,
             url='/api/v4/spot/tickers',
             params=params
-        ).json()
+        )
