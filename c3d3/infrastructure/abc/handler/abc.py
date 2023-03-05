@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import overload, final
 
-from c3d3.core.decorators.camel2snake.decorators import camel2snake
-from c3d3.core.decorators.classproperty.decorators import classproperty
+from c3d3.core.decorators.camel2snake.decorator import camel2snake
+from c3d3.core.decorators.classproperty.decorator import classproperty
 
 
 class iHandler(ABC):
@@ -12,11 +12,11 @@ class iHandler(ABC):
         raise NotImplementedError
 
     @overload
-    def do(self, *args, **kwargs):
+    def do(self):
         ...
 
     @abstractmethod
-    def do(self, *args, **kwargs):
+    def do(self):
         raise NotImplementedError
 
     @final
