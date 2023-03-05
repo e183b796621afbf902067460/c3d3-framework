@@ -1,22 +1,11 @@
 from typing import Optional, List
-import hmac
-import hashlib
-from urllib.parse import urlencode
 
-from c3d3.core.c3.interfaces.exchanges.interface import iCBE
+from c3d3.domain.c3.wrappers.binance.spot.wrapper import BinanceSpotExchange
 from c3d3.core.decorators.permission.decorator import permission
 
 
-class BinanceUSDTmExchange(iCBE):
+class BinanceUsdtmExchange(BinanceSpotExchange):
     _ENDPOINT, _HEARTBEAT = 'https://fapi.binance.com', '/fapi/v1/ping'
-
-    __X_MBX_KEY = 'X-MBX-APIKEY'
-
-    def __signature(self, params: dict):
-        return hmac.new(self.secret_key.encode('utf-8'), urlencode(params).replace('%40', '@').encode('utf-8'), hashlib.sha256).hexdigest()
-
-    def __header(self) -> dict:
-        return {self.__X_MBX_KEY: self.api_key}
 
     def tickerPrice(self, symbol: Optional[str] = None, symbols: Optional[List[str]] = None) -> dict:
         params: dict = {'symbol': symbol} if symbol else {'symbols': symbols}
@@ -46,13 +35,13 @@ class BinanceUSDTmExchange(iCBE):
             recvWindow: Optional[int] = None
     ) -> dict:
         params: dict = {'timestamp': timestamp} if recvWindow is None else {'timestamp': timestamp, 'recvWindow': recvWindow}
-        params.update({'signature': self.__signature(params)})
+        params.update({'signature': self._signature(params)})
 
         return self._r(
             method=self._GET,
             url='/fapi/v2/account',
             params=params,
-            headers=self.__header()
+            headers=self._header()
         ).json()
 
     @permission
@@ -67,13 +56,13 @@ class BinanceUSDTmExchange(iCBE):
             params.update({'symbol': symbol})
         if recvWindow:
             params.update({'recvWindow': recvWindow})
-        params.update({'signature': self.__signature(params)})
+        params.update({'signature': self._signature(params)})
 
         return self._r(
             method=self._GET,
             url='/fapi/v2/positionRisk',
             params=params,
-            headers=self.__header()
+            headers=self._header()
         ).json()
 
     @permission
@@ -86,7 +75,7 @@ class BinanceUSDTmExchange(iCBE):
         params: dict = {
             'timestamp': timestamp
         }
-        params.update({'signature': self.__signature(params)})
+        params.update({'signature': self._signature(params)})
         if symbol:
             params.update({'symbol': symbol})
         if recvWindow:
@@ -96,5 +85,5 @@ class BinanceUSDTmExchange(iCBE):
             method=self._GET,
             url='/fapi/v1/openOrders',
             params=params,
-            headers=self.__header()
+            headers=self._header()
         ).json()
