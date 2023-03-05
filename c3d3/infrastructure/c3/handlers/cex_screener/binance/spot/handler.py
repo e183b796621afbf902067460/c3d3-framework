@@ -1,10 +1,22 @@
 from c3d3.domain.c3.wrappers.binance.spot.wrapper import BinanceSpotExchange
+from c3d3.infrastructure.c3.interfaces.cex_screener.interface import iCexScreenerHandler
 
 import datetime
 import requests as r
 
 
-class BinanceSpotCexScreenerHandler(BinanceSpotExchange):
+class BinanceSpotCexScreenerHandler(BinanceSpotExchange, iCexScreenerHandler):
+
+    def __str__(self):
+        return __class__.__name__
+
+    def __init__(
+            self,
+            ticker: str, start_time: datetime.datetime, end_time: datetime.datetime,
+            *args, **kwargs
+    ) -> None:
+        BinanceSpotExchange.__init__(self, *args, **kwargs)
+        iCexScreenerHandler.__init__(self, ticker=ticker, start_time=start_time, end_time=end_time, *args, **kwargs)
 
     @staticmethod
     def _formatting(json_: dict) -> dict:
@@ -15,18 +27,13 @@ class BinanceSpotCexScreenerHandler(BinanceSpotExchange):
             'side': 'BUY' if json_['m'] else 'SELL'
         }
 
-    def get_overview(
-            self,
-            ticker: str,
-            start: datetime.datetime, end: datetime.datetime,
-            *args, **kwargs
-    ):
+    def do(self):
         overviews: list = list()
-        end = int(end.timestamp()) * 1000
+        end = int(self.end.timestamp()) * 1000
 
         agg_trades = self.aggTrades(
-            symbol=ticker,
-            startTime=int(start.timestamp()) * 1000,
+            symbol=self.ticker,
+            startTime=int(self.start.timestamp()) * 1000,
             endTime=end,
             limit=1000
         )
@@ -39,7 +46,7 @@ class BinanceSpotCexScreenerHandler(BinanceSpotExchange):
             start = agg_trades[-1]['T'] + 1
 
             agg_trades = self.aggTrades(
-                symbol=ticker,
+                symbol=self.ticker,
                 startTime=start,
                 endTime=end,
                 limit=1000
