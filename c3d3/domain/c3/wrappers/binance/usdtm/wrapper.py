@@ -86,11 +86,11 @@ class BinanceUSDTmExchange(iCBE):
         params: dict = {
             'timestamp': timestamp
         }
+        params.update({'signature': self.__signature(params)})
         if symbol:
             params.update({'symbol': symbol})
         if recvWindow:
             params.update({'recvWindow': recvWindow})
-        params.update({'signature': self.__signature(params)})
 
         return self._r(
             method=self._GET,
