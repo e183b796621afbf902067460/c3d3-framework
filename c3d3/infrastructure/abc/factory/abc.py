@@ -15,13 +15,13 @@ class iFactory(ABC):
 
     @classmethod
     @final
-    def add_object(cls, k: str, v) -> None:
+    def add_object(cls, k, v) -> None:
         if not cls.__abc.get(k):
             cls.__abc[k] = v
 
     @classmethod
     @final
-    def get_object(cls, k: str):
+    def get_object(cls, k):
         obj = cls.__abc.get(k)
         if not obj:
             raise ValueError(f'Set value for {k} in {cls.__class__.__name__} factory')

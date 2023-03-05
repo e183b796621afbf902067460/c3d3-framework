@@ -1,4 +1,5 @@
 from typing import final, overload, Dict, Any, Optional
+from datetime import datetime
 import requests as r
 
 from c3d3.infrastructure.d3.consts.chains.map import ChainMap
@@ -16,11 +17,15 @@ class iDexScreenerHandler(iHandler):
     def __init__(
             self,
             uri: str, api_key: str, chain: str,
+            start_time: datetime, end_time: datetime,
+            is_reverse: bool,
             *args, **kwargs
     ):
         self._uri = uri
         self._api_key = api_key
         self._chain = chain
+        self._start_time, self._end_time = start_time, end_time
+        self._is_reverse = is_reverse
 
         self.builder.build(
             key=self.__URI_KEY, value=self._uri
@@ -37,6 +42,18 @@ class iDexScreenerHandler(iHandler):
     @property
     def chain(self):
         return ChainMap.get_chain(name=self._chain)
+
+    @property
+    def start(self):
+        return self._start_time
+
+    @property
+    def end(self):
+        return self._end_time
+
+    @property
+    def is_reverse(self):
+        return self._is_reverse
 
     class Builder:
 
