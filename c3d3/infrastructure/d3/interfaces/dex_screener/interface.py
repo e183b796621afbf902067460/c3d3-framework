@@ -9,27 +9,24 @@ from c3d3.infrastructure.abc.handler.abc import iHandler
 class iDexScreenerHandler(iHandler):
     _FEE = None
 
-    __URI_KEY, __API_KEY, __CHAIN_KEY = 'uri', 'api_key', 'chain'
+    __API_KEY, __CHAIN_KEY = 'api_key', 'chain'
 
     def __str__(self):
         raise NotImplementedError
 
     def __init__(
             self,
-            uri: str, api_key: str, chain: str,
+            api_key: str, chain: str,
             start_time: datetime, end_time: datetime,
             is_reverse: bool,
             *args, **kwargs
     ):
-        self._uri = uri
         self._api_key = api_key
         self._chain = chain
         self._start_time, self._end_time = start_time, end_time
         self._is_reverse = is_reverse
 
         self.builder.build(
-            key=self.__URI_KEY, value=self._uri
-        ).build(
             key=self.__API_KEY, value=self._api_key
         ).build(
             key=self.__CHAIN_KEY, value=self._chain
@@ -37,7 +34,7 @@ class iDexScreenerHandler(iHandler):
 
     @property
     def api_uri(self) -> str:
-        return self._uri + 'api?module=block&action=getblocknobytime&timestamp={timestamp}&closest=before&apikey=' + self._api_key
+        return self.chain.API_ENDPOINT + 'api?module=block&action=getblocknobytime&timestamp={timestamp}&closest=before&apikey=' + self._api_key
 
     @property
     def chain(self):
@@ -60,7 +57,7 @@ class iDexScreenerHandler(iHandler):
         def __init__(self, *args, **kwargs) -> None:
             self._options: dict = dict()
 
-            self.__URI_KEY, self.__API_KEY, self.__CHAIN_KEY = args
+            self.__API_KEY, self.__CHAIN_KEY = args
 
         @overload
         def build(self, params: Dict[str, Any]) -> "iDexScreenerHandler.Builder":
@@ -79,12 +76,7 @@ class iDexScreenerHandler(iHandler):
         ) -> "iDexScreenerHandler.Builder":
 
             def validate(k: str, v: Any) -> None:
-                if k == self.__URI_KEY:
-                    if not isinstance(v, str):
-                        raise TypeError('Invalid URI type.')
-                    if not v.startswith('https:') and not v.startswith('http:'):
-                        raise r.HTTPError("Endpoint must startswith https or http, set valid endpoint.")
-                elif k == self.__API_KEY:
+                if k == self.__API_KEY:
                     if not isinstance(v, str):
                         raise TypeError('Set valid API key type.')
                 elif k == self.__CHAIN_KEY:
@@ -102,7 +94,7 @@ class iDexScreenerHandler(iHandler):
 
     @property
     def builder(self):
-        return self.Builder(self.__URI_KEY, self.__API_KEY, self.__CHAIN_KEY)
+        return self.Builder(self.__API_KEY, self.__CHAIN_KEY)
 
     def do(self):
         raise NotImplementedError

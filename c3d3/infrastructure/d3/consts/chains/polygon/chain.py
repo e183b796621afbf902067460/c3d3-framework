@@ -8,6 +8,7 @@ class Polygon:
 
     BLOCK_LIMIT = 3000
     NATIVE_TOKEN = 'MATIC'
+    API_ENDPOINT = 'https://api.polygonscan.com/'
 
     def __str__(self) -> str:
         return __class__.__name__

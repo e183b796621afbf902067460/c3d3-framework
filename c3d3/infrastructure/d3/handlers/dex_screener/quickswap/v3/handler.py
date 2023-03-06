@@ -19,13 +19,13 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
 
     def __init__(
             self,
-            uri: str, api_key: str, chain: str,
+            api_key: str, chain: str,
             start_time: datetime.datetime, end_time: datetime.datetime,
             is_reverse: bool,
             *args, **kwargs
     ) -> None:
         QuickSwapV3AlgebraPoolContract.__init__(self, *args, **kwargs)
-        iDexScreenerHandler.__init__(self, uri=uri, api_key=api_key, chain=chain, start_time=start_time, end_time=end_time, is_reverse=is_reverse, *args, **kwargs)
+        iDexScreenerHandler.__init__(self, api_key=api_key, chain=chain, start_time=start_time, end_time=end_time, is_reverse=is_reverse, *args, **kwargs)
 
     def do(self):
         r_start = requests.get(self.api_uri.format(timestamp=int(self.start.timestamp()))).json()['result']
@@ -33,7 +33,7 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
         start_block = int(r_start)
         end_block = int(r_end)
 
-        w3 = Web3(self.node)
+        w3 = Web3(self.provider)
         w3.middleware_onion.inject(
             geth_poa_middleware,
             layer=0

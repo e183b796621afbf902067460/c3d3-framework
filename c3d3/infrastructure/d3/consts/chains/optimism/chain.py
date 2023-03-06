@@ -8,6 +8,7 @@ class Optimism:
 
     BLOCK_LIMIT = 3000
     NATIVE_TOKEN = 'ETH'
+    API_ENDPOINT = 'https://api-optimistic.etherscan.io/'
 
     def __str__(self) -> str:
         return __class__.__name__

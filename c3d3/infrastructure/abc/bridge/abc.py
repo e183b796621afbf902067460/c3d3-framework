@@ -6,7 +6,7 @@ from c3d3.infrastructure.abc.handler.abc import iHandler
 
 class iBridge(ABC):
 
-    def __init__(self, abstract_factory: iFactory, factory_key: str, object_key: str) -> None:
+    def __init__(self, abstract_factory, factory_key, object_key) -> None:
         self._abstract_factory = abstract_factory
 
         self._factory_key, self._object_key = factory_key, object_key
@@ -18,5 +18,8 @@ class iBridge(ABC):
     def _concrete_fabric(self) -> iFactory:
         return self.abstract_factory.get_object(self._factory_key)
 
-    def concrete_object(self) -> iHandler:
+    def _concrete_object(self):
         return self._concrete_fabric().get_object(self._object_key)
+
+    def init_object(self, *args, **kwargs) -> iHandler:
+        return self._concrete_object()(*args, **kwargs)

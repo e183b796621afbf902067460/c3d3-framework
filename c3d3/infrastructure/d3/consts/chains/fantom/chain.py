@@ -8,6 +8,7 @@ class Fantom:
 
     BLOCK_LIMIT = 3000
     NATIVE_TOKEN = 'FTM'
+    API_ENDPOINT = 'https://api.ftmscan.com/'
 
     def __str__(self) -> str:
         return __class__.__name__
