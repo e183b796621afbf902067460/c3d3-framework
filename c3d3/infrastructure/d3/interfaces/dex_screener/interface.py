@@ -2,7 +2,7 @@ from typing import final, overload, Dict, Any, Optional
 from datetime import datetime
 import requests as r
 
-from c3d3.infrastructure.d3.consts.chains.map import ChainMap
+from c3d3.domain.d3.adhoc.chains.map import ChainMap
 from c3d3.infrastructure.abc.handler.abc import iHandler
 
 

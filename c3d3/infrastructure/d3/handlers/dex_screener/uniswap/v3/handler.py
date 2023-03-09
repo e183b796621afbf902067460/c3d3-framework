@@ -1,5 +1,5 @@
 from c3d3.infrastructure.d3.interfaces.dex_screener.interface import iDexScreenerHandler
-from c3d3.infrastructure.d3.consts.chains.optimism.chain import Optimism
+from c3d3.domain.d3.adhoc.chains.optimism.chain import Optimism
 
 from c3d3.domain.d3.wrappers.uniswap.v3.pool.wrapper import UniSwapV3PoolContract
 from c3d3.domain.d3.adhoc.erc20.adhoc import ERC20TokenContract
