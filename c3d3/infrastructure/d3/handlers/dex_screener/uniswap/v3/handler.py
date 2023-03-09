@@ -1,9 +1,11 @@
+from c3d3.infrastructure.d3.interfaces.dex_screener.interface import iDexScreenerHandler
+from c3d3.infrastructure.d3.consts.chains.optimism.chain import Optimism
+
+from c3d3.domain.d3.wrappers.uniswap.v3.pool.wrapper import UniSwapV3PoolContract
+from c3d3.domain.d3.adhoc.erc20.adhoc import ERC20TokenContract
+
 import datetime
 import requests
-
-from c3d3.domain.d3.adhoc.erc20.adhoc import ERC20TokenContract
-from c3d3.domain.d3.wrappers.quickswap.v3.pool.wrapper import QuickSwapV3AlgebraPoolContract
-from c3d3.infrastructure.d3.interfaces.dex_screener.interface import iDexScreenerHandler
 
 from web3.middleware import geth_poa_middleware
 from web3._utils.events import get_event_data
@@ -11,7 +13,7 @@ from web3 import Web3
 from web3.exceptions import MismatchedABI, TransactionNotFound
 
 
-class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreenerHandler):
+class UniSwapV3DexScreenerHandler(UniSwapV3PoolContract, iDexScreenerHandler):
     _FEE = None
 
     def __str__(self):
@@ -24,12 +26,13 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
             is_reverse: bool,
             *args, **kwargs
     ) -> None:
-        QuickSwapV3AlgebraPoolContract.__init__(self, *args, **kwargs)
+        UniSwapV3PoolContract.__init__(self, *args, **kwargs)
         iDexScreenerHandler.__init__(self, api_key=api_key, chain=chain, start_time=start_time, end_time=end_time, is_reverse=is_reverse, *args, **kwargs)
 
     def do(self):
         r_start = requests.get(self.api_uri.format(timestamp=int(self.start.timestamp()))).json()['result']
         r_end = requests.get(self.api_uri.format(timestamp=int(self.end.timestamp()))).json()['result']
+
         start_block = int(r_start)
         end_block = int(r_end)
 
@@ -38,6 +41,7 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
             geth_poa_middleware,
             layer=0
         )
+        self._FEE = self.fee() / 10 ** 6
 
         t0_address, t1_address = self.token0(), self.token1()
         t0 = ERC20TokenContract(address=t0_address, node=self.node)
@@ -73,25 +77,16 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
                 ts = w3.eth.getBlock(event_data['blockNumber']).timestamp
                 if ts > self.end.timestamp():
                     break
-                sqrt_p, liquidity = event_data['args']['price'], event_data['args']['liquidity']
+                sqrt_p, liquidity = event_data['args']['sqrtPriceX96'], event_data['args']['liquidity']
 
-                a0, a1 = event_data['args']['amount0'], event_data['args']['amount1']
-                try:
-                    receipt = w3.eth.get_transaction_receipt(event_data['transactionHash'].hex())
-                except TransactionNotFound:
-                    continue
+                a0 = event_data['args']['amount0'] if not self.is_reverse else event_data['args']['amount1']
+                a1 = event_data['args']['amount1'] if not self.is_reverse else event_data['args']['amount0']
 
-                for log in receipt['logs']:
-                    if log['topics'][0].hex() == '0x598b9f043c813aa6be3426ca60d1c65d17256312890be5118dab55b0775ebe2a':
-                        self._FEE = int(log['data'], 16) / 10 ** 6
-                        break
-                else:
-                    continue
-                a0, a1 = a0 if not self.is_reverse else a1, a1 if not self.is_reverse else a0
                 try:
                     price = abs((a1 / 10 ** t1_decimals) / (a0 / 10 ** t0_decimals))
+                    receipt = w3.eth.get_transaction_receipt(event_data['transactionHash'].hex())
                     recipient = receipt['to']
-                except (ZeroDivisionError, KeyError):
+                except (TransactionNotFound, ZeroDivisionError, KeyError):
                     continue
 
                 overview.append(
@@ -107,9 +102,9 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
                         'sqrt_p': sqrt_p,
                         'liquidity': liquidity,
                         'fee': self._FEE,
-                        'gas_used': receipt['gasUsed'],
+                        'gas_used': receipt['gasUsed'] if self.chain.name != Optimism.name else int(receipt['l1GasUsed'], 16),
+                        'effective_gas_price': receipt['effectiveGasPrice'] / 10 ** 18 if self.chain.name != Optimism.name else int(receipt['l1GasPrice'], 16) / 10 ** 18,
                         'gas_symbol': self.chain.NATIVE_TOKEN,
-                        'effective_gas_price': receipt['effectiveGasPrice'] / 10 ** 18,
                         'index_position_in_the_block': receipt['transactionIndex'],
                         'tx_hash': event_data['transactionHash'].hex(),
                         'ts': datetime.datetime.utcfromtimestamp(ts)
