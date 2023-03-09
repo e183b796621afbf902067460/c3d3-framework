@@ -1,8 +1,6 @@
 from c3d3.infrastructure.d3.interfaces.dex_screener.interface import iDexScreenerHandler
 from c3d3.domain.d3.adhoc.chains.optimism.chain import Optimism
-
 from c3d3.domain.d3.wrappers.uniswap.v3.pool.wrapper import UniSwapV3PoolContract
-from c3d3.domain.d3.adhoc.erc20.adhoc import ERC20TokenContract
 
 import datetime
 import requests
@@ -43,15 +41,11 @@ class UniSwapV3DexScreenerHandler(UniSwapV3PoolContract, iDexScreenerHandler):
         )
         self._FEE = self.fee() / 10 ** 6
 
-        t0_address, t1_address = self.token0(), self.token1()
-        t0 = ERC20TokenContract(address=t0_address, node=self.node)
-        t1 = ERC20TokenContract(address=t1_address, node=self.node)
+        t0, t1 = self.token0(), self.token1()
+        t0, t1 = t0 if not self.is_reverse else t1, t1 if not self.is_reverse else t0
 
         t0_decimals, t1_decimals = t0.decimals(), t1.decimals()
-        t0_decimals, t1_decimals = t0_decimals if not self.is_reverse else t1_decimals, t1_decimals if not self.is_reverse else t0_decimals
-
-        t0_symbol, t1_symbol = t0.symbol(), t1.symbol()
-        pool_symbol = f'{t0_symbol}/{t1_symbol}' if not self.is_reverse else f'{t1_symbol}/{t0_symbol}'
+        pool_symbol = f'{t0.symbol()}/{t1.symbol()}'
 
         event_swap, event_codec, event_abi = self.contract.events.Swap, self.contract.events.Swap.web3.codec, self.contract.events.Swap._get_event_abi()
 

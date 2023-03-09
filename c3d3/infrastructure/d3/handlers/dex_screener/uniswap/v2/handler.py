@@ -1,7 +1,5 @@
 from c3d3.infrastructure.d3.interfaces.dex_screener.interface import iDexScreenerHandler
-
 from c3d3.domain.d3.wrappers.uniswap.v2.pool.wrapper import UniSwapV2PairContract
-from c3d3.domain.d3.adhoc.erc20.adhoc import ERC20TokenContract
 
 import datetime
 import requests
@@ -42,15 +40,11 @@ class UniSwapV2DexScreenerHandler(UniSwapV2PairContract, iDexScreenerHandler):
             layer=0
         )
 
-        t0_address, t1_address = self.token0(), self.token1()
-        t0 = ERC20TokenContract(address=t0_address, node=self.node)
-        t1 = ERC20TokenContract(address=t1_address, node=self.node)
+        t0, t1 = self.token0(), self.token1()
+        t0, t1 = t0 if not self.is_reverse else t1, t1 if not self.is_reverse else t0
 
         t0_decimals, t1_decimals = t0.decimals(), t1.decimals()
-        t0_decimals, t1_decimals = t0_decimals if not self.is_reverse else t1_decimals, t1_decimals if not self.is_reverse else t0_decimals
-
-        t0_symbol, t1_symbol = t0.symbol(), t1.symbol()
-        pool_symbol = f'{t0_symbol}/{t1_symbol}' if not self.is_reverse else f'{t1_symbol}/{t0_symbol}'
+        pool_symbol = f'{t0.symbol()}/{t1.symbol()}'
 
         event_swap, event_codec, event_abi = self.contract.events.Sync, self.contract.events.Sync.web3.codec, self.contract.events.Sync._get_event_abi()
         overview = list()

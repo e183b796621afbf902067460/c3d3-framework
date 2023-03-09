@@ -1,5 +1,7 @@
 from typing import List
+
 from c3d3.core.d3.interfaces.contracts.interface import iCBC
+from c3d3.domain.d3.adhoc.erc20.adhoc import ERC20TokenContract
 
 
 class QuickSwapV3AlgebraPoolContract(iCBC):
@@ -48,11 +50,11 @@ class QuickSwapV3AlgebraPoolContract(iCBC):
     def timepoints(self, i: int) -> list:
         return self.contract.functions.timepoints(i).call()
 
-    def token0(self) -> str:
-        return self.contract.functions.token0().call()
+    def token0(self) -> ERC20TokenContract:
+        return ERC20TokenContract(self.contract.functions.token0().call(), self.node)
 
-    def token1(self) -> str:
-        return self.contract.functions.token1().call()
+    def token1(self) -> ERC20TokenContract:
+        return ERC20TokenContract(self.contract.functions.token1().call(), self.node)
 
     def totalFeeGrowth0Token(self) -> int:
         return self.contract.functions.totalFeeGrowth0Token().call()
