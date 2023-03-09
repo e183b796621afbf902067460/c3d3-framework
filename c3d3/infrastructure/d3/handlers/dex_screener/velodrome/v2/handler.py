@@ -17,7 +17,7 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
     _FEE = None
 
     _factories = {
-        Optimism.name: '0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746'
+        Optimism.name: Web3.toChecksumAddress('0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746')
     }
 
     def __str__(self):
