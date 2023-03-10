@@ -27,12 +27,14 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
             self,
             api_key: str, chain: str,
             start_time: datetime.datetime, end_time: datetime.datetime,
-            is_reverse: bool, is_child: bool = False,
+            is_reverse: bool,
             *args, **kwargs
     ) -> None:
-        if not is_child:
-            VelodromePairV2Contract.__init__(self, *args, **kwargs)
+        VelodromePairV2Contract.__init__(self, *args, **kwargs)
         iDexScreenerHandler.__init__(self, api_key=api_key, chain=chain, start_time=start_time, end_time=end_time, is_reverse=is_reverse, *args, **kwargs)
+
+    def _factory(self):
+        return VelodromePairFactoryV2Contract(self._factories[self.chain.name], self.node)
 
     def do(self):
         r_start = requests.get(self.api_uri.format(timestamp=int(self.start.timestamp()))).json()['result']
@@ -46,7 +48,7 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
             layer=0
         )
 
-        factory = VelodromePairFactoryV2Contract(address=self._factories[self.chain.name], node=self.node)
+        factory = self._factory()
         self._FEE = factory.getFee(isStable=self.stable()) / 10 ** 4
 
         t0, t1 = self.token0(), self.token1()
