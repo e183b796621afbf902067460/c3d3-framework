@@ -27,10 +27,11 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
             self,
             api_key: str, chain: str,
             start_time: datetime.datetime, end_time: datetime.datetime,
-            is_reverse: bool,
+            is_reverse: bool, is_child: bool = False,
             *args, **kwargs
     ) -> None:
-        VelodromePairV2Contract.__init__(self, *args, **kwargs)
+        if not is_child:
+            VelodromePairV2Contract.__init__(self, *args, **kwargs)
         iDexScreenerHandler.__init__(self, api_key=api_key, chain=chain, start_time=start_time, end_time=end_time, is_reverse=is_reverse, *args, **kwargs)
 
     def do(self):
