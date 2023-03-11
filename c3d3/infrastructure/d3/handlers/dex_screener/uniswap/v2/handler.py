@@ -110,7 +110,7 @@ class UniSwapV2DexScreenerHandler(UniSwapV2PairContract, iDexScreenerHandler):
                         'gas_symbol': self.chain.NATIVE_TOKEN,
                         'index_position_in_the_block': receipt['transactionIndex'],
                         'tx_hash': event_data['transactionHash'].hex(),
-                        'time': datetime.datetime.utcfromtimestamp(ts)
+                        'ts': datetime.datetime.utcfromtimestamp(ts)
                     }
                 )
         return overview

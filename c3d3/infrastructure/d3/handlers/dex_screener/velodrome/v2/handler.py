@@ -27,10 +27,11 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
             self,
             api_key: str, chain: str,
             start_time: datetime.datetime, end_time: datetime.datetime,
-            is_reverse: bool,
+            is_reverse: bool, is_child: bool = False,
             *args, **kwargs
     ) -> None:
-        VelodromePairV2Contract.__init__(self, *args, **kwargs)
+        if not is_child:
+            VelodromePairV2Contract.__init__(self, *args, **kwargs)
         iDexScreenerHandler.__init__(self, api_key=api_key, chain=chain, start_time=start_time, end_time=end_time, is_reverse=is_reverse, *args, **kwargs)
 
     def _factory(self):
@@ -89,8 +90,6 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
                 except TransactionNotFound:
                     continue
 
-                tx_index = int(tx['index'], 16)
-
                 transfers = self.contract.events.Swap().processReceipt(receipt, errors=DISCARD)
                 amount0, amount1 = None, None
                 for transfer in transfers:
@@ -119,12 +118,12 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
                         'decimals0': t0_decimals,
                         'decimals1': t1_decimals,
                         'fee': self._FEE,
-                        'gas_used': int(receipt['l1GasUsed'], 16),
-                        'effective_gas_price': int(receipt['l1GasPrice'], 16) / 10 ** 18,
+                        'gas_used': receipt['gasUsed'] if self.chain.name != Optimism.name else int(receipt['l1GasUsed'], 16),
+                        'effective_gas_price': receipt['effectiveGasPrice'] / 10 ** 18 if self.chain.name != Optimism.name else int(receipt['l1GasPrice'], 16) / 10 ** 18,
                         'gas_symbol': self.chain.NATIVE_TOKEN,
-                        'index_position_in_the_block': tx_index,
+                        'index_position_in_the_block': receipt['transactionIndex'] if self.chain.name != Optimism.name else int(tx['index'], 16),
                         'tx_hash': event_data['transactionHash'].hex(),
-                        'time': datetime.datetime.utcfromtimestamp(ts)
+                        'ts': datetime.datetime.utcfromtimestamp(ts)
                     }
                 )
         return overview

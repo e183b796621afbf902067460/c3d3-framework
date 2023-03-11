@@ -7,6 +7,7 @@ from c3d3.infrastructure.d3.handlers.dex_screener.uniswap.v2.handler import UniS
 from c3d3.infrastructure.d3.handlers.dex_screener.kyberswap.v3.handler import KyberSwapV3DexScreenerHandler
 from c3d3.infrastructure.d3.handlers.dex_screener.velodrome.v2.handler import VelodromeV2DexScreenerHandler
 from c3d3.infrastructure.d3.handlers.dex_screener.spookyswap.v2.handler import SpookySwapV2DexScreenerHandler
+from c3d3.infrastructure.d3.handlers.dex_screener.equalizer.v2.handler import EqualizerV2DexScreenerHandler
 
 
 class DexScreenerFactory(iFactory):
@@ -22,3 +23,4 @@ DexScreenerFactory.add_object(k=UniSwapV3DexScreenerHandler.key, v=UniSwapV3DexS
 DexScreenerFactory.add_object(k=KyberSwapV3DexScreenerHandler.key, v=KyberSwapV3DexScreenerHandler)
 DexScreenerFactory.add_object(k=VelodromeV2DexScreenerHandler.key, v=VelodromeV2DexScreenerHandler)
 DexScreenerFactory.add_object(k=SpookySwapV2DexScreenerHandler.key, v=SpookySwapV2DexScreenerHandler)
+DexScreenerFactory.add_object(k=EqualizerV2DexScreenerHandler.key, v=EqualizerV2DexScreenerHandler)
