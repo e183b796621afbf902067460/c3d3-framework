@@ -33,8 +33,8 @@ class iDexScreenerHandler(iHandler):
         )
 
     @property
-    def api_uri(self) -> str:
-        return self.chain.API_ENDPOINT + 'api?module=block&action=getblocknobytime&timestamp={timestamp}&closest=before&apikey=' + self._api_key
+    def api_key(self) -> str:
+        return self._api_key
 
     @property
     def chain(self):

@@ -38,8 +38,8 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
         return VelodromePairFactoryV2Contract(self._factories[self.chain.name], self.node)
 
     def do(self):
-        r_start = requests.get(self.api_uri.format(timestamp=int(self.start.timestamp()))).json()['result']
-        r_end = requests.get(self.api_uri.format(timestamp=int(self.end.timestamp()))).json()['result']
+        r_start = self.chain.get_block_by_ts(ts=int(self.start.timestamp()), api_key=self.api_key)
+        r_end = self.chain.get_block_by_ts(ts=int(self.end.timestamp()), api_key=self.api_key)
         start_block = int(r_start)
         end_block = int(r_end)
 

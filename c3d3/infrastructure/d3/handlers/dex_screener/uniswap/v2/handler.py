@@ -29,8 +29,8 @@ class UniSwapV2DexScreenerHandler(UniSwapV2PairContract, iDexScreenerHandler):
         iDexScreenerHandler.__init__(self, api_key=api_key, chain=chain, start_time=start_time, end_time=end_time, is_reverse=is_reverse, *args, **kwargs)
 
     def do(self):
-        r_start = requests.get(self.api_uri.format(timestamp=int(self.start.timestamp()))).json()['result']
-        r_end = requests.get(self.api_uri.format(timestamp=int(self.end.timestamp()))).json()['result']
+        r_start = self.chain.get_block_by_ts(ts=int(self.start.timestamp()), api_key=self.api_key)
+        r_end = self.chain.get_block_by_ts(ts=int(self.end.timestamp()), api_key=self.api_key)
         start_block = int(r_start)
         end_block = int(r_end)
 
