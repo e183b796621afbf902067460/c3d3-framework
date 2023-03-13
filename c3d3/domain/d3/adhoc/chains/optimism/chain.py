@@ -20,6 +20,7 @@ class Optimism:
     def name(self) -> str:
         return self.__str__(self)
 
-    def get_block_by_ts(self, ts: int, api_key: str) -> str:
-        return requests.get(self.API_ENDPOINT + f'?module=block&action=getblocknobytime&timestamp={ts}&closest=before&apikey=' + api_key).json()['result']
+    @classmethod
+    def get_block_by_ts(cls, ts: int, api_key: str) -> str:
+        return requests.get(cls.API_ENDPOINT + f'?module=block&action=getblocknobytime&timestamp={ts}&closest=before&apikey=' + api_key).json()['result']
 

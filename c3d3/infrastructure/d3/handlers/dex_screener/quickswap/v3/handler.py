@@ -81,8 +81,6 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
                     if log['topics'][0].hex() == '0x598b9f043c813aa6be3426ca60d1c65d17256312890be5118dab55b0775ebe2a':
                         self._FEE = int(log['data'], 16) / 10 ** 6
                         break
-                else:
-                    continue
                 try:
                     price = abs((a1 / 10 ** t1_decimals) / (a0 / 10 ** t0_decimals))
                     recipient = receipt['to']
