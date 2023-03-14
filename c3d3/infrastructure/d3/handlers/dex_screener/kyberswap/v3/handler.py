@@ -47,7 +47,7 @@ class KyberSwapV3DexScreenerHandler(KyberSwapV3PoolContract, iDexScreenerHandler
         t0_decimals, t1_decimals = t0.decimals(), t1.decimals()
         pool_symbol = f'{t0.symbol()}/{t1.symbol()}'
 
-        event_swap, event_codec, event_abi = self.contract.events.Swap, self.contract.events.Swap.web3.codec, self.contract.events.Swap._get_event_abi()
+        event_swap, event_codec, event_abi = self.contract.events.Swap, self.contract.events.Swap.w3.codec, self.contract.events.Swap._get_event_abi()
 
         overview = list()
         while start_block < end_block:
@@ -68,7 +68,7 @@ class KyberSwapV3DexScreenerHandler(KyberSwapV3PoolContract, iDexScreenerHandler
                     )
                 except MismatchedABI:
                     continue
-                ts = w3.eth.getBlock(event_data['blockNumber']).timestamp
+                ts = w3.eth.get_block(event_data['blockNumber']).timestamp
                 if ts > self.end.timestamp():
                     break
                 sqrt_p, liquidity = event_data['args']['sqrtP'], event_data['args']['liquidity']

@@ -66,7 +66,7 @@ class UniSwapV2DexScreenerHandler(UniSwapV2PairContract, iDexScreenerHandler):
                     )
                 except MismatchedABI:
                     continue
-                ts = w3.eth.getBlock(event_data['blockNumber']).timestamp
+                ts = w3.eth.get_block(event_data['blockNumber']).timestamp
                 if ts > self.end.timestamp():
                     break
                 r0, r1 = event_data['args']['reserve0'], event_data['args']['reserve1']

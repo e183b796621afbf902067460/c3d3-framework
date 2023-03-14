@@ -11,7 +11,7 @@ from web3.exceptions import MismatchedABI, TransactionNotFound
 
 
 class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreenerHandler):
-    _FEE = None
+    _FEE = 0.0005
 
     def __str__(self):
         return __class__.__name__
@@ -44,7 +44,7 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
         t0_decimals, t1_decimals = t0.decimals(), t1.decimals()
         pool_symbol = f'{t0.symbol()}/{t1.symbol()}'
 
-        event_swap, event_codec, event_abi = self.contract.events.Swap, self.contract.events.Swap.web3.codec, self.contract.events.Swap._get_event_abi()
+        event_swap, event_codec, event_abi = self.contract.events.Swap, self.contract.events.Swap.w3.codec, self.contract.events.Swap._get_event_abi()
 
         overview = list()
         while start_block < end_block:
@@ -65,7 +65,7 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
                     )
                 except MismatchedABI:
                     continue
-                ts = w3.eth.getBlock(event_data['blockNumber']).timestamp
+                ts = w3.eth.get_block(event_data['blockNumber']).timestamp
                 if ts > self.end.timestamp():
                     break
                 sqrt_p, liquidity = event_data['args']['price'], event_data['args']['liquidity']
@@ -79,7 +79,7 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
 
                 for log in receipt['logs']:
                     if log['topics'][0].hex() == '0x598b9f043c813aa6be3426ca60d1c65d17256312890be5118dab55b0775ebe2a':
-                        self._FEE = int(log['data'], 16) / 10 ** 6
+                        self._FEE = int(log['data'].hex(), 16) / 10 ** 6
                         break
                 try:
                     price = abs((a1 / 10 ** t1_decimals) / (a0 / 10 ** t0_decimals))

@@ -7,6 +7,7 @@ from web3.exceptions import ValidationError, CannotHandleRequest
 from web3.providers.base import BaseProvider
 
 from c3d3.core.d3.typings.nodes.typing import NodeType
+from c3d3.domain.d3.adhoc.nodes.http.adhoc import HTTPNode
 
 
 class iCBC(ABC):
@@ -68,11 +69,11 @@ class iCBC(ABC):
 
             def validate(k: str, v: Any) -> None:
                 if k == self.__ADDRESS_KEY:
-                    if not Web3.isAddress(value=v):
+                    if not Web3.is_address(value=v):
                         raise ValidationError("Invalid address.")
                 elif k == self.__NODE_KEY:
-                    if not v.provider.isConnected():
-                        raise CannotHandleRequest("Node is unhealthy.")
+                    if not isinstance(v, HTTPNode):
+                        raise CannotHandleRequest("Value is not a iCBN subclass.")
                 elif k == self.__ABI_KEY:
                     if not isinstance(v, str):
                         raise TypeError(f'Invalid ABI type: {type(v)}.')
@@ -89,7 +90,7 @@ class iCBC(ABC):
         @final
         def preprocess(self) -> "iCBC.Builder":
             if self._options.get(self.__ADDRESS_KEY):
-                self._options[self.__ADDRESS_KEY] = Web3.toChecksumAddress(value=self._options.get(self.__ADDRESS_KEY))
+                self._options[self.__ADDRESS_KEY] = Web3.to_checksum_address(value=self._options.get(self.__ADDRESS_KEY))
             return self
 
         @final

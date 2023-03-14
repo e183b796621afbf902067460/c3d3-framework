@@ -17,7 +17,7 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
     _FEE = None
 
     _factories = {
-        Optimism.name: Web3.toChecksumAddress('0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746')
+        Optimism.name: Web3.to_checksum_address('0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746')
     }
 
     def __str__(self):
@@ -78,7 +78,7 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
                     )
                 except MismatchedABI:
                     continue
-                ts = w3.eth.getBlock(event_data['blockNumber']).timestamp
+                ts = w3.eth.get_block(event_data['blockNumber']).timestamp
                 if ts > self.end.timestamp():
                     break
                 r0, r1 = event_data['args']['reserve0'], event_data['args']['reserve1']

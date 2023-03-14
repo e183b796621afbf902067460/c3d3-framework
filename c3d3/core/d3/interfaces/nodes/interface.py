@@ -72,7 +72,7 @@ class iCBN(ABC):
             protocol = self._options.get(self.__PROTOCOL_KEY)
             if protocol in ('http', 'https'):
                 provider = HTTPProvider(endpoint_uri=self._options.get(self.__URI_KEY))
-                if provider.isConnected():
+                if provider.is_connected():
                     self._options[self.__PROVIDER_KEY] = provider
                 else:
                     raise CannotHandleRequest("HTTP provider is down.")
