@@ -19,4 +19,6 @@ class ChainMap:
 
     @classmethod
     def get_chain(cls, name: str):
-        return cls.chains.get(name)
+        for chain in cls.chains.keys():
+            if chain in name:
+                return cls.chains.get(chain)
