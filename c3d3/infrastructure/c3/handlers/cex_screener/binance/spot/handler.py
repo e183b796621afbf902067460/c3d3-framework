@@ -1,5 +1,6 @@
 from c3d3.domain.c3.wrappers.binance.spot.wrapper import BinanceSpotExchange
 from c3d3.infrastructure.c3.interfaces.cex_screener.interface import iCexScreenerHandler
+from c3d3.core.decorators.to_dataframe.decorator import to_dataframe
 
 import datetime
 import requests as r
@@ -13,20 +14,22 @@ class BinanceSpotCexScreenerHandler(BinanceSpotExchange, iCexScreenerHandler):
     def __init__(
             self,
             ticker: str, start_time: datetime.datetime, end_time: datetime.datetime,
+            is_child: bool = False,
             *args, **kwargs
     ) -> None:
-        BinanceSpotExchange.__init__(self, *args, **kwargs)
+        if not is_child:
+            BinanceSpotExchange.__init__(self, *args, **kwargs)
         iCexScreenerHandler.__init__(self, ticker=ticker, start_time=start_time, end_time=end_time, *args, **kwargs)
 
-    @staticmethod
-    def _formatting(json_: dict) -> dict:
+    def _formatting(self, json_: dict) -> dict:
         return {
-            'price': float(json_['p']),
-            'qty': float(json_['q']),
-            'ts': datetime.datetime.fromtimestamp(json_['T'] / 10 ** 3),
-            'side': 'BUY' if json_['m'] else 'SELL'
+            self._PRICE_COLUMN: float(json_['p']),
+            self._QTY_COLUMN: float(json_['q']),
+            self._TS_COLUMN: datetime.datetime.fromtimestamp(json_['T'] / 10 ** 3),
+            self._SIDE_COLUMN: 'BUY' if json_['m'] else 'SELL'
         }
 
+    @to_dataframe
     def do(self):
         overviews: list = list()
         end = int(self.end.timestamp()) * 1000
