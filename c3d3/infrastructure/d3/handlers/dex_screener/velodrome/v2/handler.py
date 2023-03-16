@@ -3,6 +3,7 @@ from c3d3.domain.d3.wrappers.velodrome.v2.factory.wrapper import VelodromePairFa
 from c3d3.domain.d3.adhoc.chains.optimism.chain import Optimism
 from c3d3.infrastructure.d3.interfaces.dex_screener.interface import iDexScreenerHandler
 from c3d3.infrastructure.trad3r.root.root import TraderRoot
+from c3d3.core.decorators.to_dataframe.decorator import to_dataframe
 
 import datetime
 import requests
@@ -38,6 +39,7 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
     def _factory(self):
         return VelodromePairFactoryV2Contract(self._factories[self.chain.name], self.node)
 
+    @to_dataframe
     def do(self):
         r_start = self.chain.get_block_by_ts(ts=int(self.start.timestamp()), api_key=self.api_key)
         r_end = self.chain.get_block_by_ts(ts=int(self.end.timestamp()), api_key=self.api_key)

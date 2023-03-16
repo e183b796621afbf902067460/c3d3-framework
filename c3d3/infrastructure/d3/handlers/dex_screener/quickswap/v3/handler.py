@@ -4,6 +4,7 @@ import requests
 from c3d3.domain.d3.wrappers.quickswap.v3.pool.wrapper import QuickSwapV3AlgebraPoolContract
 from c3d3.infrastructure.d3.interfaces.dex_screener.interface import iDexScreenerHandler
 from c3d3.infrastructure.trad3r.root.root import TraderRoot
+from c3d3.core.decorators.to_dataframe.decorator import to_dataframe
 
 from web3.middleware import geth_poa_middleware
 from web3._utils.events import get_event_data
@@ -27,6 +28,7 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
         QuickSwapV3AlgebraPoolContract.__init__(self, *args, **kwargs)
         iDexScreenerHandler.__init__(self, api_key=api_key, chain=chain, start_time=start_time, end_time=end_time, is_reverse=is_reverse, *args, **kwargs)
 
+    @to_dataframe
     def do(self):
         r_start = self.chain.get_block_by_ts(ts=int(self.start.timestamp()), api_key=self.api_key)
         r_end = self.chain.get_block_by_ts(ts=int(self.end.timestamp()), api_key=self.api_key)
