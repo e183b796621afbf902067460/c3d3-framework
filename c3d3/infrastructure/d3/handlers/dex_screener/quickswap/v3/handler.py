@@ -3,6 +3,7 @@ import requests
 
 from c3d3.domain.d3.wrappers.quickswap.v3.pool.wrapper import QuickSwapV3AlgebraPoolContract
 from c3d3.infrastructure.d3.interfaces.dex_screener.interface import iDexScreenerHandler
+from c3d3.infrastructure.trad3r.root.root import TraderRoot
 
 from web3.middleware import geth_poa_middleware
 from web3._utils.events import get_event_data
@@ -86,26 +87,29 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
                     recipient = receipt['to']
                 except (ZeroDivisionError, KeyError):
                     continue
-
                 overview.append(
                     {
-                        'symbol': pool_symbol,
-                        'price': price,
-                        'sender': receipt['from'],
-                        'recipient': recipient,
-                        'amount0': a0,
-                        'amount1': a1,
-                        'decimals0': t0_decimals,
-                        'decimals1': t1_decimals,
-                        'sqrt_p': sqrt_p,
-                        'liquidity': liquidity,
-                        'fee': self._FEE,
-                        'gas_used': receipt['gasUsed'],
-                        'gas_symbol': self.chain.NATIVE_TOKEN,
-                        'effective_gas_price': receipt['effectiveGasPrice'] / 10 ** 18,
-                        'index_position_in_the_block': receipt['transactionIndex'],
-                        'tx_hash': event_data['transactionHash'].hex(),
-                        'ts': datetime.datetime.utcfromtimestamp(ts)
+                        self._CHAIN_NAME_COLUMN: self.chain.name,
+                        self._POOL_ADDRESS_COLUMN: self.contract.address,
+                        self._PROTOCOL_NAME_COLUMN: self.key,
+                        self._POOL_SYMBOL_COLUMN: pool_symbol,
+                        self._TRADE_PRICE_COLUMN: price,
+                        self._SENDER_COLUMN: receipt['from'],
+                        self._RECIPIENT_COLUMN: recipient,
+                        self._AMOUNT0_COLUMN: a0,
+                        self._AMOUNT1_COLUMN: a1,
+                        self._DECIMALS0_COLUMN: t0_decimals,
+                        self._DECIMALS1_COLUMN: t1_decimals,
+                        self._SQRT_P_COLUMN: sqrt_p,
+                        self._LIQUIDITY_COLUMN: liquidity,
+                        self._TRADE_FEE_COLUMN: self._FEE,
+                        self._GAS_USED_COLUMN: receipt['gasUsed'],
+                        self._GAS_SYMBOL_COLUMN: self.chain.NATIVE_TOKEN,
+                        self._EFFECTIVE_GAS_PRICE_COLUMN: receipt['effectiveGasPrice'],
+                        self._GAS_USD_PRICE_COLUMN: TraderRoot.get_price(self.chain.NATIVE_TOKEN),
+                        self._INDEX_POSITION_IN_THE_BLOCK_COLUMN: receipt['transactionIndex'],
+                        self._TX_HASH_COLUMN: event_data['transactionHash'].hex(),
+                        self._TS_COLUMN: datetime.datetime.utcfromtimestamp(ts)
                     }
                 )
         return overview
