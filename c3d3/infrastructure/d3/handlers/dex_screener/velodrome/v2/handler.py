@@ -124,11 +124,11 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
                         self._DECIMALS0_COLUMN: t0_decimals,
                         self._DECIMALS1_COLUMN: t1_decimals,
                         self._TRADE_FEE_COLUMN: self._FEE,
-                        self._GAS_USED_COLUMN: receipt['gasUsed'] if self.chain.name != Optimism.name else int(receipt['l1GasUsed'], 16),
-                        self._EFFECTIVE_GAS_PRICE_COLUMN: receipt['effectiveGasPrice'] if self.chain.name != Optimism.name else int(receipt['l1GasPrice'], 16),
+                        self._GAS_USED_COLUMN: receipt['gasUsed'] if self.chain.name not in Optimism.name else int(receipt['l1GasUsed'], 16),
+                        self._EFFECTIVE_GAS_PRICE_COLUMN: receipt['effectiveGasPrice'] if self.chain.name not in Optimism.name else int(receipt['l1GasPrice'], 16),
                         self._GAS_SYMBOL_COLUMN: self.chain.NATIVE_TOKEN,
                         self._GAS_USD_PRICE_COLUMN: TraderRoot.get_price(self.chain.NATIVE_TOKEN),
-                        self._INDEX_POSITION_IN_THE_BLOCK_COLUMN: receipt['transactionIndex'] if self.chain.name != Optimism.name else int(tx['index'], 16),
+                        self._INDEX_POSITION_IN_THE_BLOCK_COLUMN: receipt['transactionIndex'] if self.chain.name not in Optimism.name else int(tx['index'], 16),
                         self._TX_HASH_COLUMN: event_data['transactionHash'].hex(),
                         self._TS_COLUMN: datetime.datetime.utcfromtimestamp(ts)
                     }
