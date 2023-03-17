@@ -6,6 +6,8 @@ import datetime
 
 class BinanceUsdtmCexScreenerHandler(BinanceUsdtmExchange, BinanceSpotCexScreenerHandler):
 
+    _FEE = 0.0004
+
     def __str__(self):
         return __class__.__name__
 

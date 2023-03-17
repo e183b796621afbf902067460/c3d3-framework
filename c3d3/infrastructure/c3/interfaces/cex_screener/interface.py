@@ -7,11 +7,14 @@ from c3d3.infrastructure.abc.handler.abc import iHandler
 
 class iCexScreenerHandler(iHandler):
 
+    _FEE = None
+
     __TICKER_KEY, __START_TIME_KEY, __END_TIME_KEY = 'ticker', 'start_time', 'end_time'
 
     _PRICE_COLUMN = 'price'
     _QTY_COLUMN = 'qty'
     _SIDE_COLUMN = 'side'
+    _TRADE_FEE_COLUMN = 'trade_fee'
     _TS_COLUMN = 'ts'
 
     def __str__(self):
@@ -100,6 +103,7 @@ class iCexScreenerHandler(iHandler):
             self._PRICE_COLUMN,
             self._QTY_COLUMN,
             self._SIDE_COLUMN,
+            self._TRADE_FEE_COLUMN,
             self._TS_COLUMN
         ]
 
