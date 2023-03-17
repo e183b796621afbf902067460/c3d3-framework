@@ -25,7 +25,10 @@ class BinanceSpotTraderLeaf(iTraderLeaf, BinanceSpotExchange):
 
     def get_price(self, a: str, b: str, *args, **kwargs) -> Optional[float]:
         a, b = self._peg(symbol=a), 'USDT' if b == 'USD' else b
-        return float(self.tickerPrice(symbol=a + b).json()['price'])
+        try:
+            return float(self.tickerPrice(symbol=a + b).json()['price'])
+        except KeyError:
+            return None
 
 
 BinanceSpotTraderLeaf = BinanceSpotTraderLeaf()

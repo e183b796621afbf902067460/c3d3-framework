@@ -34,7 +34,10 @@ class CoinGeckoV3TraderLeaf(iTraderLeaf, CoinGeckoV3Exchange):
         while response.status_code == 429:
             time.sleep(self.__SLEEP)
             response = self.simplePrice(ids=a, vs_currencies=b)
-        return response.json()[a][b]
+        try:
+            return response.json()[a][b]
+        except KeyError:
+            return None
 
 
 CoinGeckoV3TraderLeaf = CoinGeckoV3TraderLeaf()

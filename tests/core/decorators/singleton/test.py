@@ -13,4 +13,3 @@ class TestSingleToneDecorator:
     def test_one(self):
         first, second = SingleToneExampleOne(), SingleToneExampleOne()
         assert first is second
-
