@@ -3,6 +3,7 @@ from typing import overload, final
 
 from c3d3.core.decorators.camel2snake.decorator import camel2snake
 from c3d3.core.decorators.classproperty.decorator import classproperty
+from c3d3.core.decorators.threadmethod.decorator import threadmethod
 
 
 class iHandler(ABC):
@@ -24,3 +25,8 @@ class iHandler(ABC):
     @camel2snake
     def key(self) -> str:
         return self.__str__(self)
+
+    @final
+    @threadmethod
+    def threaded(self):
+        return self.do()

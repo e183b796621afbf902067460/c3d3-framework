@@ -10,8 +10,8 @@ def _call(func, future, *args, **kwargs):
 
 def threadmethod(fn):
     @wraps(fn)
-    def wrapper(*args, **kwargs):
+    def wrapper(self):
         future = Future()
-        Thread(target=_call, args=(fn, future, *args, kwargs)).start()
+        Thread(target=_call, args=(fn, future, self)).start()
         return future
     return wrapper
