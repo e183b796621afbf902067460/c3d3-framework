@@ -11,6 +11,8 @@ class iCexScreenerHandler(iHandler):
 
     __TICKER_KEY, __START_TIME_KEY, __END_TIME_KEY = 'ticker', 'start_time', 'end_time'
 
+    _EXCHANGE_COLUMN = 'exchange'
+    _TICKER_COLUMN = 'ticker'
     _PRICE_COLUMN = 'price'
     _QTY_COLUMN = 'qty'
     _SIDE_COLUMN = 'side'
@@ -100,6 +102,8 @@ class iCexScreenerHandler(iHandler):
     @property
     def __columns(self):
         return [
+            self._EXCHANGE_COLUMN,
+            self._TICKER_COLUMN,
             self._PRICE_COLUMN,
             self._QTY_COLUMN,
             self._SIDE_COLUMN,

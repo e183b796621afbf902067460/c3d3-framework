@@ -25,6 +25,8 @@ class BinanceSpotCexScreenerHandler(BinanceSpotExchange, iCexScreenerHandler):
 
     def _formatting(self, json_: dict) -> dict:
         return {
+            self._EXCHANGE_COLUMN: self.key,
+            self._TICKER_COLUMN: self.ticker,
             self._PRICE_COLUMN: float(json_['p']),
             self._QTY_COLUMN: float(json_['q']),
             self._TS_COLUMN: datetime.datetime.fromtimestamp(json_['T'] / 10 ** 3),
