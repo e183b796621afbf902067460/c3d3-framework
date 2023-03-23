@@ -61,7 +61,7 @@ class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler
         t0_decimals, t1_decimals = t0.decimals(), t1.decimals()
         pool_symbol = f'{t0.symbol()}/{t1.symbol()}'
 
-        event_swap, event_codec, event_abi = self.contract.events.Sync, self.contract.events.Sync.web3.codec, self.contract.events.Sync._get_event_abi()
+        event_swap, event_codec, event_abi = self.contract.events.Sync, self.contract.events.Sync.w3.codec, self.contract.events.Sync._get_event_abi()
         overview = list()
         while start_block < end_block:
             events = w3.eth.get_logs(

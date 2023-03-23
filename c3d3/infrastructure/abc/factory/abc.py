@@ -32,3 +32,7 @@ class iFactory(ABC):
     @camel2snake
     def key(self) -> str:
         return self.__str__(self)
+
+    @classproperty
+    def abc(self):
+        return self.__abc
