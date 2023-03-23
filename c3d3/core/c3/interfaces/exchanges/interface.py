@@ -3,6 +3,7 @@ from abc import ABC
 import builtins
 
 import requests as r
+from urllib3.connectionpool import ReadTimeoutError
 
 
 class iCBE(ABC):
@@ -120,7 +121,7 @@ class iCBE(ABC):
                 status = r.get(self._options[self.__ENDPOINT_KEY] + self._options[self.__HEARTBEAT_KEY], timeout=self.__TIMEOUT).status_code
             except KeyError:
                 raise TypeError('Set valid ping or endpoint parameter.')
-            except r.ReadTimeout:
+            except (r.ReadTimeout, ReadTimeoutError):
                 builtins.print(f'Read timeout {self.__init__.__name__} in {self.cls.__class__.__name__}.')
             except r.ConnectionError:
                 builtins.print(f'Broken {self.__init__.__name__} in {self.cls.__class__.__name__}.')
