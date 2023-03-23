@@ -80,7 +80,7 @@ class UniSwapV2DexScreenerHandler(UniSwapV2PairContract, iDexScreenerHandler):
                 except TransactionNotFound:
                     continue
 
-                transfers = self.contract.events.Swap().processReceipt(receipt, errors=DISCARD)
+                transfers = self.contract.events.Swap().process_receipt(receipt, errors=DISCARD)
                 amount0, amount1 = None, None
                 for transfer in transfers:
                     if transfer['address'] == self.contract.address:
