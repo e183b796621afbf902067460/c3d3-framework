@@ -3,6 +3,7 @@ from c3d3.core.decorators.classproperty.decorator import classproperty
 from c3d3.domain.d3.adhoc.chains.fantom.chain import Fantom
 from c3d3.domain.d3.adhoc.chains.optimism.chain import Optimism
 from c3d3.domain.d3.adhoc.chains.polygon.chain import Polygon
+from c3d3.domain.d3.adhoc.chains.arbitrum.chain import Arbitrum
 
 
 class ChainMap:
@@ -10,7 +11,8 @@ class ChainMap:
     _CHAINS = {
         Fantom.name: Fantom,
         Optimism.name: Optimism,
-        Polygon.name: Polygon
+        Polygon.name: Polygon,
+        Arbitrum.name: Arbitrum
     }
 
     @classproperty
