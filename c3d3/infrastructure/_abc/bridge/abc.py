@@ -1,7 +1,7 @@
 from abc import ABC
 
-from c3d3.infrastructure.abc.factory.abc import iFactory
-from c3d3.infrastructure.abc.handler.abc import iHandler
+from c3d3.infrastructure._abc.factory.abc import iFactory
+from c3d3.infrastructure._abc.handler.abc import iHandler
 
 
 class iBridge(ABC):

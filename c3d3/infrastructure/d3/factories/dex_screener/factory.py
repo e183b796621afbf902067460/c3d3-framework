@@ -1,4 +1,4 @@
-from c3d3.infrastructure.abc.factory.abc import iFactory
+from c3d3.infrastructure._abc.factory.abc import iFactory
 
 from c3d3.infrastructure.d3.handlers.dex_screener.quickswap.v3.handler import QuickSwapV3DexScreenerHandler
 from c3d3.infrastructure.d3.handlers.dex_screener.quickswap.v2.handler import QuickSwapV2DexScreenerHandler

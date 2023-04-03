@@ -1,4 +1,4 @@
-from c3d3.infrastructure.abc.factory.abc import iFactory
+from c3d3.infrastructure._abc.factory.abc import iFactory
 
 from c3d3.infrastructure.c3.factories.cex_screener.factory import CexScreenerFactory
 
