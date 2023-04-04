@@ -37,7 +37,6 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
     ) -> Response:
         params: dict = {'timestamp': timestamp} if recvWindow is None else {'timestamp': timestamp, 'recvWindow': recvWindow}
         params.update({'signature': self._signature(params)})
-
         return self._r(
             method=self._GET,
             url='/fapi/v2/account',
@@ -58,7 +57,6 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
         if recvWindow:
             params.update({'recvWindow': recvWindow})
         params.update({'signature': self._signature(params)})
-
         return self._r(
             method=self._GET,
             url='/fapi/v2/positionRisk',
@@ -76,12 +74,11 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
         params: dict = {
             'timestamp': timestamp
         }
-        params.update({'signature': self._signature(params)})
         if symbol:
             params.update({'symbol': symbol})
         if recvWindow:
             params.update({'recvWindow': recvWindow})
-
+        params.update({'signature': self._signature(params)})
         return self._r(
             method=self._GET,
             url='/fapi/v1/openOrders',

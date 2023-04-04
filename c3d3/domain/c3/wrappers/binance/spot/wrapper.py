@@ -48,7 +48,6 @@ class BinanceSpotExchange(iCBE):
     ) -> Response:
         params: dict = {'timestamp': timestamp} if recvWindow is None else {'timestamp': timestamp, 'recvWindow': recvWindow}
         params.update({'signature': self._signature(params)})
-
         return self._r(
             method=self._GET,
             url='/api/v3/account',
