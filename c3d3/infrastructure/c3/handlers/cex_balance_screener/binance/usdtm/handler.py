@@ -28,7 +28,7 @@ class BinanceUsdtmCexBalanceScreenerHandler(BinanceUsdtmExchange, iCexBalanceScr
             self._EXCHANGE_COLUMN: self.key,
             self._LABEL_COLUMN: self.label,
             self._TICKER_COLUMN: self.ticker,
-            self._PRICE_COLUMN: TraderRoot.get_price(self.ticker),
+            self._CURRENT_PRICE_COLUMN: TraderRoot.get_price(self.ticker),
             self._QTY_COLUMN: float(json_['marginBalance']),
             self._TS_COLUMN: datetime.datetime.utcnow()
         }

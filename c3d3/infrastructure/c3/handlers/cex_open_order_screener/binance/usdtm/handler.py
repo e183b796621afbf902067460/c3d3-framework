@@ -29,8 +29,8 @@ class BinanceUsdtmCexOpenOrderScreenerHandler(BinanceUsdtmExchange, iCexOpenOrde
             self._EXCHANGE_COLUMN: self.key,
             self._LABEL_COLUMN: self.label,
             self._TICKER_COLUMN: self.ticker,
-            self._PRICE_COLUMN: TraderRoot.get_price(self.ticker[:-4], source=BinanceUsdtmTraderLeaf.key),
-            self._TRADE_PRICE_COLUMN: float(json_['price']) if json_['price'] is not None else json_['price'],
+            self._CURRENT_PRICE_COLUMN: TraderRoot.get_price(self.ticker[:-4], source=BinanceUsdtmTraderLeaf.key),
+            self._ENTRY_PRICE_COLUMN: float(json_['price']) if json_['price'] is not None else json_['price'],
             self._QTY_COLUMN: float(json_['origQty']) if json_['origQty'] is not None else json_['origQty'],
             self._SIDE_COLUMN: json_['side'],
             self._TS_COLUMN: datetime.datetime.utcnow()
