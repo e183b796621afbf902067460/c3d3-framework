@@ -12,7 +12,7 @@ class iCexBalanceScreenerHandler(iHandler):
     _EXCHANGE_COLUMN = 'exchange'
     _LABEL_COLUMN = 'label'
     _TICKER_COLUMN = 'ticker'
-    _PRICE_COLUMN = 'price'
+    _CURRENT_PRICE_COLUMN = 'current_price'
     _QTY_COLUMN = 'qty'
     _TS_COLUMN = 'ts'
 
@@ -92,7 +92,7 @@ class iCexBalanceScreenerHandler(iHandler):
             self._EXCHANGE_COLUMN,
             self._LABEL_COLUMN,
             self._TICKER_COLUMN,
-            self._PRICE_COLUMN,
+            self._CURRENT_PRICE_COLUMN,
             self._QTY_COLUMN,
             self._TS_COLUMN
         ]
