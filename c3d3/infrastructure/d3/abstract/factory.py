@@ -1,6 +1,7 @@
 from c3d3.infrastructure._abc.factory.abc import iFactory
 
 from c3d3.infrastructure.d3.factories.dex_screener.factory import DexScreenerFactory
+from c3d3.infrastructure.d3.factories.dex_supply_screener.factory import DexSupplyScreenerFactory
 
 
 class D3AbstractFactory(iFactory):
@@ -10,4 +11,5 @@ class D3AbstractFactory(iFactory):
 
 
 D3AbstractFactory.add_object(k=DexScreenerFactory.key, v=DexScreenerFactory)
+D3AbstractFactory.add_object(k=DexSupplyScreenerFactory.key, v=DexSupplyScreenerFactory)
 
