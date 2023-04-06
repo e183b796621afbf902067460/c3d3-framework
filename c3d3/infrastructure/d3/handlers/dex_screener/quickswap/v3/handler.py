@@ -13,7 +13,7 @@ from web3.exceptions import MismatchedABI, TransactionNotFound
 
 
 class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreenerHandler):
-    _FEE, _VERSION = 0.0005, 'v3'
+    _FEE = 0.0005
 
     def __str__(self):
         return __class__.__name__

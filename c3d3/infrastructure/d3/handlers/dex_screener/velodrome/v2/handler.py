@@ -16,7 +16,7 @@ from web3.exceptions import MismatchedABI, TransactionNotFound
 
 
 class VelodromeV2DexScreenerHandler(VelodromePairV2Contract, iDexScreenerHandler):
-    _FEE, _VERSION = None, 'v2'
+    _FEE = None
 
     _factories = {
         Optimism.name: Web3.to_checksum_address('0x25CbdDb98b35ab1FF77413456B31EC81A6B6B746')

@@ -34,8 +34,6 @@ class iCexScreenerHandler(iHandler):
             key=self.__END_TIME_KEY, value=self._end_time
         )
 
-        self._df = self.__init_df()
-
     @property
     def start(self):
         return self._start_time
@@ -47,10 +45,6 @@ class iCexScreenerHandler(iHandler):
     @property
     def ticker(self):
         return self._ticker
-
-    @property
-    def df(self) -> pd.DataFrame:
-        return self._df
 
     class Builder:
 
@@ -98,18 +92,3 @@ class iCexScreenerHandler(iHandler):
 
     def do(self):
         raise NotImplementedError
-
-    @property
-    def __columns(self):
-        return [
-            self._EXCHANGE_COLUMN,
-            self._TICKER_COLUMN,
-            self._PRICE_COLUMN,
-            self._QTY_COLUMN,
-            self._SIDE_COLUMN,
-            self._TRADE_FEE_COLUMN,
-            self._TS_COLUMN
-        ]
-
-    def __init_df(self) -> pd.DataFrame:
-        return pd.DataFrame(columns=self.__columns)

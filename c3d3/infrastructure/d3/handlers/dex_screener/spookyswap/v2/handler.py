@@ -5,7 +5,7 @@ from c3d3.infrastructure.d3.handlers.dex_screener.uniswap.v2.handler import UniS
 
 
 class SpookySwapV2DexScreenerHandler(SpookySwapV2PairContract, UniSwapV2DexScreenerHandler):
-    _FEE, _VERSION = 0.002, 'v2'
+    _FEE = 0.002
 
     def __str__(self):
         return __class__.__name__

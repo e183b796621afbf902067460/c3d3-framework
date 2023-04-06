@@ -9,11 +9,9 @@ from c3d3.infrastructure._abc.handler.abc import iHandler
 
 
 class iDexScreenerHandler(iHandler):
-    _FEE, _VERSION = None, None
+    _FEE = None
 
     __API_KEY, __CHAIN_KEY = 'api_key', 'chain'
-
-    __V2, __V3 = 'v2', 'v3'
 
     _CHAIN_NAME_COLUMN = 'chain_name'
     _POOL_ADDRESS_COLUMN = 'pool_address'
@@ -60,8 +58,6 @@ class iDexScreenerHandler(iHandler):
             key=self.__CHAIN_KEY, value=self._chain
         )
 
-        self._df = self.__init_df()
-
     @property
     def api_key(self) -> str:
         return self._api_key
@@ -81,10 +77,6 @@ class iDexScreenerHandler(iHandler):
     @property
     def is_reverse(self):
         return self._is_reverse
-
-    @property
-    def df(self) -> pd.DataFrame:
-        return self._df
 
     class Builder:
 
@@ -132,61 +124,3 @@ class iDexScreenerHandler(iHandler):
 
     def do(self):
         raise NotImplementedError
-
-    @property
-    def __v2_columns(self):
-        return [
-            self._CHAIN_NAME_COLUMN,
-            self._POOL_ADDRESS_COLUMN,
-            self._PROTOCOL_NAME_COLUMN,
-            self._POOL_SYMBOL_COLUMN,
-            self._TRADE_PRICE_COLUMN,
-            self._SENDER_COLUMN,
-            self._RECIPIENT_COLUMN,
-            self._RESERVE0_COLUMN,
-            self._RESERVE1_COLUMN,
-            self._AMOUNT0_COLUMN,
-            self._AMOUNT1_COLUMN,
-            self._DECIMALS0_COLUMN,
-            self._DECIMALS1_COLUMN,
-            self._TRADE_FEE_COLUMN,
-            self._GAS_USED_COLUMN,
-            self._EFFECTIVE_GAS_PRICE_COLUMN,
-            self._GAS_SYMBOL_COLUMN,
-            self._GAS_USD_PRICE_COLUMN,
-            self._INDEX_POSITION_IN_THE_BLOCK_COLUMN,
-            self._TX_HASH_COLUMN,
-            self._TS_COLUMN
-        ]
-
-    @property
-    def __v3_columns(self):
-        return [
-            self._CHAIN_NAME_COLUMN,
-            self._POOL_ADDRESS_COLUMN,
-            self._PROTOCOL_NAME_COLUMN,
-            self._POOL_SYMBOL_COLUMN,
-            self._TRADE_PRICE_COLUMN,
-            self._SENDER_COLUMN,
-            self._RECIPIENT_COLUMN,
-            self._AMOUNT0_COLUMN,
-            self._AMOUNT1_COLUMN,
-            self._DECIMALS0_COLUMN,
-            self._DECIMALS1_COLUMN,
-            self._SQRT_P_COLUMN,
-            self._LIQUIDITY_COLUMN,
-            self._TRADE_FEE_COLUMN,
-            self._GAS_USED_COLUMN,
-            self._EFFECTIVE_GAS_PRICE_COLUMN,
-            self._GAS_SYMBOL_COLUMN,
-            self._GAS_USD_PRICE_COLUMN,
-            self._INDEX_POSITION_IN_THE_BLOCK_COLUMN,
-            self._TX_HASH_COLUMN,
-            self._TS_COLUMN
-        ]
-
-    def __init_df(self) -> pd.DataFrame:
-        if self._VERSION == self.__V2:
-            return pd.DataFrame(columns=self.__v2_columns)
-        elif self._VERSION == self.__V3:
-            return pd.DataFrame(columns=self.__v3_columns)

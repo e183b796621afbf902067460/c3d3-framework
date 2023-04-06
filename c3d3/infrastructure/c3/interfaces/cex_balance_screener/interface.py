@@ -28,8 +28,6 @@ class iCexBalanceScreenerHandler(iHandler):
             key=self.__LABEL_KEY, value=self._label
         )
 
-        self._df = self.__init_df()
-
     @property
     def ticker(self):
         return self._ticker
@@ -37,10 +35,6 @@ class iCexBalanceScreenerHandler(iHandler):
     @property
     def label(self):
         return self._label
-
-    @property
-    def df(self) -> pd.DataFrame:
-        return self._df
 
     class Builder:
 
@@ -85,17 +79,3 @@ class iCexBalanceScreenerHandler(iHandler):
 
     def do(self):
         raise NotImplementedError
-
-    @property
-    def __columns(self):
-        return [
-            self._EXCHANGE_COLUMN,
-            self._LABEL_COLUMN,
-            self._TICKER_COLUMN,
-            self._CURRENT_PRICE_COLUMN,
-            self._QTY_COLUMN,
-            self._TS_COLUMN
-        ]
-
-    def __init_df(self) -> pd.DataFrame:
-        return pd.DataFrame(columns=self.__columns)

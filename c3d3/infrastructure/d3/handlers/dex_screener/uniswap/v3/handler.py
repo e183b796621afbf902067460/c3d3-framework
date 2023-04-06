@@ -14,7 +14,7 @@ from web3.exceptions import MismatchedABI, TransactionNotFound
 
 
 class UniSwapV3DexScreenerHandler(UniSwapV3PoolContract, iDexScreenerHandler):
-    _FEE, _VERSION = None, 'v3'
+    _FEE = None
 
     def __str__(self):
         return __class__.__name__
