@@ -8,8 +8,8 @@ from c3d3.core.decorators.camel2snake.decorator import camel2snake
 class Bsc:
 
     BLOCK_LIMIT = 3000
-    NATIVE_TOKEN = 'MATIC'
-    API_ENDPOINT = 'https://api.polygonscan.com/api'
+    NATIVE_TOKEN = 'BNB'
+    API_ENDPOINT = 'https://api.bscscan.com/api'
 
     def __str__(self) -> str:
         return __class__.__name__
