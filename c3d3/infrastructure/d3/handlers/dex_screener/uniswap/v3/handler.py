@@ -82,7 +82,8 @@ class UniSwapV3DexScreenerHandler(UniSwapV3PoolContract, iDexScreenerHandler):
                 try:
                     price = abs((a1 / 10 ** t1_decimals) / (a0 / 10 ** t0_decimals))
                     receipt = w3.eth.get_transaction_receipt(event_data['transactionHash'].hex())
-                    tx = w3.eth.get_transaction(event_data['transactionHash'])
+                    if self.chain.name in Optimism.name:
+                        tx = w3.eth.get_transaction(event_data['transactionHash'])
                     recipient = receipt['to']
                 except (TransactionNotFound, ZeroDivisionError, KeyError):
                     continue
