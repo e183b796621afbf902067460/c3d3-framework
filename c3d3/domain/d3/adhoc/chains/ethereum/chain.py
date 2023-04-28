@@ -1,20 +1,20 @@
 from typing import final
-import datetime
 import requests
 import time
+import datetime
 
 from c3d3.core.decorators.classproperty.decorator import classproperty
 from c3d3.core.decorators.camel2snake.decorator import camel2snake
 
-from web3.datastructures import AttributeDict
 from web3.types import HexBytes
+from web3.datastructures import AttributeDict
 
 
-class Arbitrum:
+class Ethereum:
 
-    BLOCK_LIMIT = 12000
+    BLOCK_LIMIT = 3000
     NATIVE_TOKEN = 'ETH'
-    API_ENDPOINT = 'https://api.arbiscan.io/api'
+    API_ENDPOINT = 'https://api.etherscan.io/api'
 
     _LAST_REQ_INT = None
     _REQ_LIMIT = .2
