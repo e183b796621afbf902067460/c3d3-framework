@@ -18,7 +18,7 @@ class iDexScreenerHandler(iHandler):
     _PROTOCOL_NAME_COLUMN = 'protocol_name'
     _POOL_SYMBOL_COLUMN = 'pool_symbol'
     _TRADE_PRICE_COLUMN = 'trade_price'
-    _SENDER_COLUMN = 'sender',
+    _SENDER_COLUMN = 'sender'
     _RECIPIENT_COLUMN = 'recipient'
     _RESERVE0_COLUMN = 'reserve0'
     _RESERVE1_COLUMN = 'reserve1'

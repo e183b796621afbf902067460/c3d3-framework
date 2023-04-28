@@ -30,10 +30,10 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
 
     @to_dataframe
     def do(self):
-        r_start = self.chain.get_block_by_ts(ts=int(self.start.timestamp()), api_key=self.api_key)
-        r_end = self.chain.get_block_by_ts(ts=int(self.end.timestamp()), api_key=self.api_key)
-        start_block = int(r_start)
-        end_block = int(r_end)
+        start_ts, end_ts = self.start.timestamp(), self.end.timestamp()
+        r_start = self.chain.get_block_by_ts(ts=int(start_ts), api_key=self.api_key)
+        r_end = self.chain.get_block_by_ts(ts=int(end_ts), api_key=self.api_key)
+        start_block, end_block = int(r_start), int(r_end)
 
         w3 = Web3(self.provider)
         w3.middleware_onion.inject(
@@ -50,71 +50,70 @@ class QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreener
         event_swap, event_codec, event_abi = self.contract.events.Swap, self.contract.events.Swap.w3.codec, self.contract.events.Swap._get_event_abi()
 
         overview = list()
-        while start_block < end_block:
-            events = w3.eth.get_logs(
+        logs = self.chain.get_logs(
+            address=self.contract.address,
+            start_time=self.start,
+            end_time=self.end,
+            start_block=start_block,
+            end_block=end_block,
+            api_key=self.api_key
+        )
+        for log in logs:
+            try:
+                event_data = get_event_data(
+                    abi_codec=event_codec,
+                    event_abi=event_abi,
+                    log_entry=log
+                )
+            except MismatchedABI:
+                continue
+            ts = self.chain.hex2int(log.timeStamp)
+            if ts > end_ts:
+                break
+            sqrt_p, liquidity = event_data['args']['price'], event_data['args']['liquidity']
+
+            a0, a1 = event_data['args']['amount0'], event_data['args']['amount1']
+            a0, a1 = a0 if not self.is_reverse else a1, a1 if not self.is_reverse else a0
+            try:
+                receipt = w3.eth.get_transaction_receipt(event_data['transactionHash'].hex())
+            except TransactionNotFound:
+                continue
+
+            for log_ in receipt['logs']:
+                try:
+                    if log_['topics'][0].hex() == '0x598b9f043c813aa6be3426ca60d1c65d17256312890be5118dab55b0775ebe2a':
+                        self._FEE = int(log_['data'].hex(), 16) / 10 ** 6
+                        break
+                except IndexError:
+                    break
+            try:
+                price = abs((a1 / 10 ** t1_decimals) / (a0 / 10 ** t0_decimals))
+                recipient = receipt['to']
+            except (ZeroDivisionError, KeyError):
+                continue
+            overview.append(
                 {
-                    'fromBlock': start_block,
-                    'toBlock': start_block + self.chain.BLOCK_LIMIT,
-                    'address': self.contract.address
+                    self._CHAIN_NAME_COLUMN: self.chain.name,
+                    self._POOL_ADDRESS_COLUMN: self.contract.address,
+                    self._PROTOCOL_NAME_COLUMN: self.key,
+                    self._POOL_SYMBOL_COLUMN: pool_symbol,
+                    self._TRADE_PRICE_COLUMN: price,
+                    self._SENDER_COLUMN: receipt['from'],
+                    self._RECIPIENT_COLUMN: recipient,
+                    self._AMOUNT0_COLUMN: a0,
+                    self._AMOUNT1_COLUMN: a1,
+                    self._DECIMALS0_COLUMN: t0_decimals,
+                    self._DECIMALS1_COLUMN: t1_decimals,
+                    self._SQRT_P_COLUMN: sqrt_p,
+                    self._LIQUIDITY_COLUMN: liquidity,
+                    self._TRADE_FEE_COLUMN: self._FEE,
+                    self._GAS_USED_COLUMN: receipt['gasUsed'],
+                    self._GAS_SYMBOL_COLUMN: self.chain.NATIVE_TOKEN,
+                    self._EFFECTIVE_GAS_PRICE_COLUMN: receipt['effectiveGasPrice'],
+                    self._GAS_USD_PRICE_COLUMN: TraderRoot.get_price(self.chain.NATIVE_TOKEN),
+                    self._INDEX_POSITION_IN_THE_BLOCK_COLUMN: receipt['transactionIndex'],
+                    self._TX_HASH_COLUMN: event_data['transactionHash'].hex(),
+                    self._TS_COLUMN: datetime.datetime.utcfromtimestamp(ts)
                 }
             )
-            start_block += self.chain.BLOCK_LIMIT
-            for event in events:
-                try:
-                    event_data = get_event_data(
-                        abi_codec=event_codec,
-                        event_abi=event_abi,
-                        log_entry=event
-                    )
-                except MismatchedABI:
-                    continue
-                ts = w3.eth.get_block(event_data['blockNumber']).timestamp
-                if ts > self.end.timestamp():
-                    break
-                sqrt_p, liquidity = event_data['args']['price'], event_data['args']['liquidity']
-
-                a0, a1 = event_data['args']['amount0'], event_data['args']['amount1']
-                a0, a1 = a0 if not self.is_reverse else a1, a1 if not self.is_reverse else a0
-                try:
-                    receipt = w3.eth.get_transaction_receipt(event_data['transactionHash'].hex())
-                except TransactionNotFound:
-                    continue
-
-                for log in receipt['logs']:
-                    try:
-                        if log['topics'][0].hex() == '0x598b9f043c813aa6be3426ca60d1c65d17256312890be5118dab55b0775ebe2a':
-                            self._FEE = int(log['data'].hex(), 16) / 10 ** 6
-                            break
-                    except IndexError:
-                        break
-                try:
-                    price = abs((a1 / 10 ** t1_decimals) / (a0 / 10 ** t0_decimals))
-                    recipient = receipt['to']
-                except (ZeroDivisionError, KeyError):
-                    continue
-                overview.append(
-                    {
-                        self._CHAIN_NAME_COLUMN: self.chain.name,
-                        self._POOL_ADDRESS_COLUMN: self.contract.address,
-                        self._PROTOCOL_NAME_COLUMN: self.key,
-                        self._POOL_SYMBOL_COLUMN: pool_symbol,
-                        self._TRADE_PRICE_COLUMN: price,
-                        self._SENDER_COLUMN: receipt['from'],
-                        self._RECIPIENT_COLUMN: recipient,
-                        self._AMOUNT0_COLUMN: a0,
-                        self._AMOUNT1_COLUMN: a1,
-                        self._DECIMALS0_COLUMN: t0_decimals,
-                        self._DECIMALS1_COLUMN: t1_decimals,
-                        self._SQRT_P_COLUMN: sqrt_p,
-                        self._LIQUIDITY_COLUMN: liquidity,
-                        self._TRADE_FEE_COLUMN: self._FEE,
-                        self._GAS_USED_COLUMN: receipt['gasUsed'],
-                        self._GAS_SYMBOL_COLUMN: self.chain.NATIVE_TOKEN,
-                        self._EFFECTIVE_GAS_PRICE_COLUMN: receipt['effectiveGasPrice'],
-                        self._GAS_USD_PRICE_COLUMN: TraderRoot.get_price(self.chain.NATIVE_TOKEN),
-                        self._INDEX_POSITION_IN_THE_BLOCK_COLUMN: receipt['transactionIndex'],
-                        self._TX_HASH_COLUMN: event_data['transactionHash'].hex(),
-                        self._TS_COLUMN: datetime.datetime.utcfromtimestamp(ts)
-                    }
-                )
         return overview

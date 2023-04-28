@@ -4,7 +4,6 @@ from c3d3.infrastructure.trad3r.root.root import TraderRoot
 from c3d3.core.decorators.to_dataframe.decorator import to_dataframe
 
 import datetime
-import requests
 
 from web3.middleware import geth_poa_middleware
 from web3.logs import DISCARD
@@ -32,10 +31,10 @@ class UniSwapV2DexScreenerHandler(UniSwapV2PairContract, iDexScreenerHandler):
 
     @to_dataframe
     def do(self):
-        r_start = self.chain.get_block_by_ts(ts=int(self.start.timestamp()), api_key=self.api_key)
-        r_end = self.chain.get_block_by_ts(ts=int(self.end.timestamp()), api_key=self.api_key)
-        start_block = int(r_start)
-        end_block = int(r_end)
+        start_ts, end_ts = self.start.timestamp(), self.end.timestamp()
+        r_start = self.chain.get_block_by_ts(ts=int(start_ts), api_key=self.api_key)
+        r_end = self.chain.get_block_by_ts(ts=int(end_ts), api_key=self.api_key)
+        start_block, end_block = int(r_start), int(r_end)
 
         w3 = Web3(self.provider)
         w3.middleware_onion.inject(
@@ -51,73 +50,73 @@ class UniSwapV2DexScreenerHandler(UniSwapV2PairContract, iDexScreenerHandler):
 
         event_swap, event_codec, event_abi = self.contract.events.Sync, self.contract.events.Sync.w3.codec, self.contract.events.Sync._get_event_abi()
         overview = list()
-        while start_block < end_block:
-            events = w3.eth.get_logs(
+
+        logs = self.chain.get_logs(
+            address=self.contract.address,
+            start_time=self.start,
+            end_time=self.end,
+            start_block=start_block,
+            end_block=end_block,
+            api_key=self.api_key
+        )
+        for log in logs:
+            try:
+                event_data = get_event_data(
+                    abi_codec=event_codec,
+                    event_abi=event_abi,
+                    log_entry=log
+                )
+            except MismatchedABI:
+                continue
+            ts = self.chain.hex2int(log.timeStamp)
+            if ts > end_ts:
+                break
+            r0, r1 = event_data['args']['reserve0'], event_data['args']['reserve1']
+            r0, r1 = r0 if not self.is_reverse else r1, r1 if not self.is_reverse else r0
+
+            try:
+                receipt = w3.eth.get_transaction_receipt(event_data['transactionHash'].hex())
+            except TransactionNotFound:
+                continue
+
+            transfers = self.contract.events.Swap().process_receipt(receipt, errors=DISCARD)
+            amount0, amount1 = None, None
+            for transfer in transfers:
+                if transfer['address'] == self.contract.address:
+                    amount0 = transfer['args']['amount0In'] if transfer['args']['amount0In'] else transfer['args']['amount0Out'] * -1
+                    amount1 = transfer['args']['amount1In'] if transfer['args']['amount1In'] else transfer['args']['amount1Out'] * -1
+                    break
+            if not amount0 or not amount1:
+                continue
+            amount0, amount1 = amount0 if not self.is_reverse else amount1, amount1 if not self.is_reverse else amount0
+            try:
+                price = abs((amount1 / 10 ** t1_decimals) / (amount0 / 10 ** t0_decimals))
+                recipient = receipt['to']
+            except (ZeroDivisionError, KeyError):
+                continue
+            overview.append(
                 {
-                    'fromBlock': start_block,
-                    'toBlock': start_block + self.chain.BLOCK_LIMIT,
-                    'address': self.contract.address
+                    self._CHAIN_NAME_COLUMN: self.chain.name,
+                    self._POOL_ADDRESS_COLUMN: self.contract.address,
+                    self._PROTOCOL_NAME_COLUMN: self.key,
+                    self._POOL_SYMBOL_COLUMN: pool_symbol,
+                    self._TRADE_PRICE_COLUMN: price,
+                    self._SENDER_COLUMN: receipt['from'],
+                    self._RECIPIENT_COLUMN: recipient,
+                    self._RESERVE0_COLUMN: r0,
+                    self._RESERVE1_COLUMN: r1,
+                    self._AMOUNT0_COLUMN: amount0,
+                    self._AMOUNT1_COLUMN: amount1,
+                    self._DECIMALS0_COLUMN: t0_decimals,
+                    self._DECIMALS1_COLUMN: t1_decimals,
+                    self._TRADE_FEE_COLUMN: self._FEE,
+                    self._GAS_USED_COLUMN: receipt['gasUsed'],
+                    self._EFFECTIVE_GAS_PRICE_COLUMN: receipt['effectiveGasPrice'],
+                    self._GAS_SYMBOL_COLUMN: self.chain.NATIVE_TOKEN,
+                    self._GAS_USD_PRICE_COLUMN: TraderRoot.get_price(self.chain.NATIVE_TOKEN),
+                    self._INDEX_POSITION_IN_THE_BLOCK_COLUMN: receipt['transactionIndex'],
+                    self._TX_HASH_COLUMN: event_data['transactionHash'].hex(),
+                    self._TS_COLUMN: datetime.datetime.utcfromtimestamp(ts)
                 }
             )
-            start_block += self.chain.BLOCK_LIMIT
-            for event in events:
-                try:
-                    event_data = get_event_data(
-                        abi_codec=event_codec,
-                        event_abi=event_abi,
-                        log_entry=event
-                    )
-                except MismatchedABI:
-                    continue
-                ts = w3.eth.get_block(event_data['blockNumber']).timestamp
-                if ts > self.end.timestamp():
-                    break
-                r0, r1 = event_data['args']['reserve0'], event_data['args']['reserve1']
-                r0, r1 = r0 if not self.is_reverse else r1, r1 if not self.is_reverse else r0
-
-                try:
-                    receipt = w3.eth.get_transaction_receipt(event_data['transactionHash'].hex())
-                except TransactionNotFound:
-                    continue
-
-                transfers = self.contract.events.Swap().process_receipt(receipt, errors=DISCARD)
-                amount0, amount1 = None, None
-                for transfer in transfers:
-                    if transfer['address'] == self.contract.address:
-                        amount0 = transfer['args']['amount0In'] if transfer['args']['amount0In'] else transfer['args']['amount0Out'] * -1
-                        amount1 = transfer['args']['amount1In'] if transfer['args']['amount1In'] else transfer['args']['amount1Out'] * -1
-                        break
-                if not amount0 or not amount1:
-                    continue
-                amount0, amount1 = amount0 if not self.is_reverse else amount1, amount1 if not self.is_reverse else amount0
-                try:
-                    price = abs((amount1 / 10 ** t1_decimals) / (amount0 / 10 ** t0_decimals))
-                    recipient = receipt['to']
-                except (ZeroDivisionError, KeyError):
-                    continue
-                overview.append(
-                    {
-                        self._CHAIN_NAME_COLUMN: self.chain.name,
-                        self._POOL_ADDRESS_COLUMN: self.contract.address,
-                        self._PROTOCOL_NAME_COLUMN: self.key,
-                        self._POOL_SYMBOL_COLUMN: pool_symbol,
-                        self._TRADE_PRICE_COLUMN: price,
-                        self._SENDER_COLUMN: receipt['from'],
-                        self._RECIPIENT_COLUMN: recipient,
-                        self._RESERVE0_COLUMN: r0,
-                        self._RESERVE1_COLUMN: r1,
-                        self._AMOUNT0_COLUMN: amount0,
-                        self._AMOUNT1_COLUMN: amount1,
-                        self._DECIMALS0_COLUMN: t0_decimals,
-                        self._DECIMALS1_COLUMN: t1_decimals,
-                        self._TRADE_FEE_COLUMN: self._FEE,
-                        self._GAS_USED_COLUMN: receipt['gasUsed'],
-                        self._EFFECTIVE_GAS_PRICE_COLUMN: receipt['effectiveGasPrice'],
-                        self._GAS_SYMBOL_COLUMN: self.chain.NATIVE_TOKEN,
-                        self._GAS_USD_PRICE_COLUMN: TraderRoot.get_price(self.chain.NATIVE_TOKEN),
-                        self._INDEX_POSITION_IN_THE_BLOCK_COLUMN: receipt['transactionIndex'],
-                        self._TX_HASH_COLUMN: event_data['transactionHash'].hex(),
-                        self._TS_COLUMN: datetime.datetime.utcfromtimestamp(ts)
-                    }
-                )
         return overview
