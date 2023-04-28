@@ -27,7 +27,6 @@ class Ethereum:
         if cls._LAST_REQ_INT:
             if time.time() - cls._REQ_LIMIT < cls._LAST_REQ_INT:
                 time.sleep(cls._LAST_REQ_INT + cls._REQ_LIMIT - time.time() + .01)
-
         resp = requests.get(f"{cls.API_ENDPOINT}?{q}&apikey={api_key}").json()
         if resp['status'] == '1':
             return resp['result']
@@ -44,7 +43,7 @@ class Ethereum:
     @classmethod
     def get_block_by_ts(cls, ts: int, api_key: str) -> str:
         return cls._r(
-            q=f'?module=block&action=getblocknobytime&timestamp={ts}&closest=before',
+            q=f'module=block&action=getblocknobytime&timestamp={ts}&closest=before',
             api_key=api_key
         )
 
