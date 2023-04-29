@@ -79,8 +79,6 @@ class UniSwapV3DexScreenerHandler(UniSwapV3PoolContract, iDexScreenerHandler):
 
             try:
                 price = abs((a1 / 10 ** t1_decimals) / (a0 / 10 ** t0_decimals))
-                receipt = w3.eth.get_transaction_receipt(event_data['transactionHash'].hex())
-                recipient = receipt['to']
             except (TransactionNotFound, ZeroDivisionError, KeyError):
                 continue
             overview.append(
@@ -90,8 +88,8 @@ class UniSwapV3DexScreenerHandler(UniSwapV3PoolContract, iDexScreenerHandler):
                     self._PROTOCOL_NAME_COLUMN: self.key,
                     self._POOL_SYMBOL_COLUMN: pool_symbol,
                     self._TRADE_PRICE_COLUMN: price,
-                    self._SENDER_COLUMN: receipt['from'],
-                    self._RECIPIENT_COLUMN: recipient,
+                    self._SENDER_COLUMN: event_data.args.sender,
+                    self._RECIPIENT_COLUMN: event_data.args.recipient,
                     self._AMOUNT0_COLUMN: a0,
                     self._AMOUNT1_COLUMN: a1,
                     self._DECIMALS0_COLUMN: t0_decimals,
