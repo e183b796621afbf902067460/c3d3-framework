@@ -85,3 +85,99 @@ class BinanceUsdtmExchange(BinanceSpotExchange):
             params=params,
             headers=self._header()
         )
+
+    @permission
+    def historicalTrades(
+            self,
+            symbol: str,
+            limit: Optional[int] = None,
+            from_id: Optional[int] = None
+    ) -> Response:
+        params = dict()
+        params.update({'symbol': symbol})
+        if limit:
+            params.update({'limit': limit})
+        if from_id:
+            params.update({'fromId': from_id})
+        params.update({'signature': self._signature(params)})
+        return self._r(
+            method=self._GET,
+            url='/fapi/v1/historicalTrades',
+            params=params,
+            headers=self._header()
+        )
+
+    @permission
+    def allOrders(
+            self,
+            symbol: str,
+            timestamp: int,
+            orderId: Optional[int] = None,
+            startTime: Optional[int] = None,
+            endTime: Optional[int] = None,
+            limit: Optional[int] = None,
+            recvWindow: Optional[int] = None
+    ) -> Response:
+        params = dict()
+        params.update(
+            {
+                'symbol': symbol,
+                'timestamp': timestamp
+            }
+        )
+        if orderId:
+            params.update({'orderId': orderId})
+        if startTime:
+            params.update({'startTime': startTime})
+        if endTime:
+            params.update({'endTime': endTime})
+        if limit:
+            params.update({'limit': limit})
+        if recvWindow:
+            params.update({'recvWindow': recvWindow})
+        params.update({'signature': self._signature(params)})
+        return self._r(
+            method=self._GET,
+            url='/fapi/v1/allOrders',
+            params=params,
+            headers=self._header()
+        )
+
+    @permission
+    def userTrades(
+            self,
+            symbol: str,
+            timestamp: int,
+            orderId: Optional[int] = None,
+            fromId: Optional[int] = None,
+            startTime: Optional[int] = None,
+            endTime: Optional[int] = None,
+            limit: Optional[int] = None,
+            recvWindow: Optional[int] = None
+    ) -> Response:
+        params = dict()
+        params.update(
+            {
+                'symbol': symbol,
+                'timestamp': timestamp
+            }
+        )
+        if orderId:
+            params.update({'orderId': orderId})
+        if fromId:
+            params.update({'fromId': fromId})
+        if startTime:
+            params.update({'startTime': startTime})
+        if endTime:
+            params.update({'endTime': endTime})
+        if limit:
+            params.update({'limit': limit})
+        if recvWindow:
+            params.update({'recvWindow': recvWindow})
+        params.update({'signature': self._signature(params)})
+        return self._r(
+            method=self._GET,
+            url='/fapi/v1/userTrades',
+            params=params,
+            headers=self._header()
+        )
