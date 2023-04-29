@@ -66,6 +66,8 @@ class Ethereum:
                     q=f'module=logs&action=getLogs&address={address}&fromBlock={start_block + i * step}&toBlock={start_block + (i + 1) * step}&page={page}&offset={offset}',
                     api_key=api_key
                 )
+                if not page_logs:
+                    break
                 logs.extend(page_logs)
                 page += 1
                 if len(page_logs) < offset:
@@ -80,7 +82,9 @@ class Ethereum:
         return attrs
 
     @classmethod
-    def hex2int(cls, source):
+    def hex2int(cls, source: str):
+        if source == '0x':
+            return 0
         sign_bit_mask = 1 << (len(source) * 4 - 1)
         other_bits_mask = sign_bit_mask - 1
         value = int(source, 16)

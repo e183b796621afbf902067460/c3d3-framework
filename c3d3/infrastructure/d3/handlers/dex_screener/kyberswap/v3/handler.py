@@ -4,7 +4,6 @@ from c3d3.infrastructure.trad3r.root.root import TraderRoot
 from c3d3.core.decorators.to_dataframe.decorator import to_dataframe
 
 import datetime
-import requests
 
 from web3.middleware import geth_poa_middleware
 from web3._utils.events import get_event_data
@@ -82,8 +81,6 @@ class KyberSwapV3DexScreenerHandler(KyberSwapV3PoolContract, iDexScreenerHandler
 
             try:
                 price = abs((a1 / 10 ** t1_decimals) / (a0 / 10 ** t0_decimals))
-                receipt = w3.eth.get_transaction_receipt(event_data['transactionHash'].hex())
-                recipient = receipt['to']
             except (TransactionNotFound, ZeroDivisionError, KeyError):
                 continue
             overview.append(
@@ -93,8 +90,8 @@ class KyberSwapV3DexScreenerHandler(KyberSwapV3PoolContract, iDexScreenerHandler
                     self._PROTOCOL_NAME_COLUMN: self.key,
                     self._POOL_SYMBOL_COLUMN: pool_symbol,
                     self._TRADE_PRICE_COLUMN: price,
-                    self._SENDER_COLUMN: receipt['from'],
-                    self._RECIPIENT_COLUMN: recipient,
+                    self._SENDER_COLUMN: event_data.args.sender,
+                    self._RECIPIENT_COLUMN: event_data.args.recipient,
                     self._AMOUNT0_COLUMN: a0,
                     self._AMOUNT1_COLUMN: a1,
                     self._DECIMALS0_COLUMN: t0_decimals,
@@ -102,11 +99,11 @@ class KyberSwapV3DexScreenerHandler(KyberSwapV3PoolContract, iDexScreenerHandler
                     self._SQRT_P_COLUMN: sqrt_p,
                     self._LIQUIDITY_COLUMN: liquidity,
                     self._TRADE_FEE_COLUMN: self._FEE,
-                    self._GAS_USED_COLUMN: receipt['gasUsed'],
-                    self._EFFECTIVE_GAS_PRICE_COLUMN: receipt['effectiveGasPrice'],
+                    self._GAS_USED_COLUMN: self.chain.hex2int(log['gasUsed']),
+                    self._EFFECTIVE_GAS_PRICE_COLUMN: self.chain.hex2int(log['gasPrice']),
                     self._GAS_SYMBOL_COLUMN: self.chain.NATIVE_TOKEN,
                     self._GAS_USD_PRICE_COLUMN: TraderRoot.get_price(self.chain.NATIVE_TOKEN),
-                    self._INDEX_POSITION_IN_THE_BLOCK_COLUMN: receipt['transactionIndex'],
+                    self._INDEX_POSITION_IN_THE_BLOCK_COLUMN: self.chain.hex2int(log['transactionIndex']),
                     self._TX_HASH_COLUMN: event_data['transactionHash'].hex(),
                     self._TS_COLUMN: datetime.datetime.utcfromtimestamp(ts)
                 }
