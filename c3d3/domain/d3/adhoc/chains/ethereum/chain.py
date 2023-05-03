@@ -59,7 +59,7 @@ class Ethereum:
         logs, offset, timestamp = list(), 1000, end_time.timestamp() - start_time.timestamp()
 
         parts = int(((end_time - start_time).days * timestamp * 24 + (end_time - start_time).seconds) / timestamp)
-        step = int((end_block - start_block) / parts)
+        step = int((end_block - start_block) / parts if parts else 1)
         for i in range(parts):
             page = 1
             while True:
