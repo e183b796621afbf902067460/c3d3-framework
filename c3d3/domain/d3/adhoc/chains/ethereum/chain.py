@@ -2,6 +2,7 @@ from typing import final
 import requests
 import time
 import datetime
+import os
 
 from c3d3.core.decorators.classproperty.decorator import classproperty
 from c3d3.core.decorators.camel2snake.decorator import camel2snake
@@ -17,7 +18,7 @@ class Ethereum:
     API_ENDPOINT = 'https://api.etherscan.io/api'
 
     _LAST_REQ_INT = None
-    _REQ_LIMIT = .2
+    _REQ_LIMIT = os.getenv('SCAN_REQ_LIMIT', .2)
 
     def __str__(self) -> str:
         return __class__.__name__
