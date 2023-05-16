@@ -10,7 +10,7 @@ It's designed according to a clean architecture. The scalability of the framewor
 
 # Installation
 ```
-pip install git+https://github.com/e183b796621afbf902067460/c3d3-research-framework.git#egg=c3d3
+pip install git+https://github.com/e183b796621afbf902067460/c3d3-framework.git#egg=c3d3
 ```
 
 # Core
