@@ -1,6 +1,6 @@
 from c3d3.infrastructure._abc.factory.abc import iFactory
 
-from c3d3.infrastructure.d3.handlers.dex_screener.quickswap.v3.handler import QuickSwapV3DexScreenerHandler
+from c3d3.infrastructure.d3.handlers.dex_screener.quickswap.v3.handler import QuickSwapV3DexScreenerHandler, _QuickSwapV3DexScreenerHandler
 from c3d3.infrastructure.d3.handlers.dex_screener.quickswap.v2.handler import QuickSwapV2DexScreenerHandler
 from c3d3.infrastructure.d3.handlers.dex_screener.uniswap.v3.handler import UniSwapV3DexScreenerHandler
 from c3d3.infrastructure.d3.handlers.dex_screener.uniswap.v2.handler import UniSwapV2DexScreenerHandler
@@ -24,3 +24,5 @@ DexScreenerFactory.add_object(k=KyberSwapV3DexScreenerHandler.key, v=KyberSwapV3
 DexScreenerFactory.add_object(k=VelodromeV2DexScreenerHandler.key, v=VelodromeV2DexScreenerHandler)
 DexScreenerFactory.add_object(k=SpookySwapV2DexScreenerHandler.key, v=SpookySwapV2DexScreenerHandler)
 DexScreenerFactory.add_object(k=EqualizerV2DexScreenerHandler.key, v=EqualizerV2DexScreenerHandler)
+
+DexScreenerFactory.add_object(k=_QuickSwapV3DexScreenerHandler.key, v=_QuickSwapV3DexScreenerHandler)
