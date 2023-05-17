@@ -8,6 +8,38 @@ C3D3 is a framework that helps to get needed blockchain data from smart-contract
 
 It's designed according to a clean architecture. The scalability of the framework is based on it's architecture that provides a simple way to scale up amount of a new adapters and add it to right factories. Each factory is an independent analytical unit and must located at abstract factory. Bridge helps to orchestrate of whole amount of factories and adapters.
 
+# Developer's Preparation
+
+Clone repository:
+```
+https://github.com/e183b796621afbf902067460/c3d3-framework.git
+```
+
+Get into the project folder:
+```
+cd c3d3-framework/
+```
+
+Create `notebooks` folder to store any tests:
+```
+mkdir notebooks; touch notebook/__init__.py
+```
+
+Create virtual environment:
+```
+python3 -m venv venv
+```
+
+And activate it:
+```
+source venv/bin/activate
+```
+
+Install requirements:
+```
+pip3 install -r requirements.txt
+```
+
 # Installation
 ```
 pip install git+https://github.com/e183b796621afbf902067460/c3d3-framework.git#egg=c3d3
