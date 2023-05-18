@@ -228,7 +228,7 @@ class _QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreene
                     self._TX_HASH_COLUMN: event_data['transactionHash'].hex(),
                     'bid': bid,
                     'ask': ask,
-                    'size': a1 / 10 ** t1_decimals,
+                    'size': abs(a1 / 10 ** t1_decimals),
                     'gwei': self.chain.hex2int(log['gasPrice']) * self.chain.hex2int(log['gasUsed']) / 10 ** 18,
                     'gas_price': self.chain.hex2int(log['gasPrice']) / 10 ** 9,
                     self._TS_COLUMN: datetime.datetime.utcfromtimestamp(ts)
