@@ -129,11 +129,19 @@ class _QuickSwapV3DexScreenerHandler(QuickSwapV3AlgebraPoolContract, iDexScreene
 
     def _get_bid(self, d0: int, d1: int, liquidity: float, sqrt: float):
         d0, d1 = 10 ** d0, 10 ** d1
-        return 1 / abs(self.SIZE / ((2 ** 96 / sqrt - 1 / (sqrt / 2 ** 96 - self.SIZE * d0 * (1 - self._FEE) / liquidity)) * liquidity / d1))
+        if not self.is_reverse:
+            result = abs(((liquidity * ((1 / ((self.SIZE * d0 * (1 - self._FEE) / liquidity) + 1 / (sqrt / 2 ** 96))) - sqrt / 2 ** 96)) / d1) / self.SIZE)
+        else:
+            result = 1 / abs(self.SIZE / ((2 ** 96 / sqrt - 1 / (sqrt / 2 ** 96 - self.SIZE * d0 * (1 - self._FEE) / liquidity)) * liquidity / d1))
+        return result
 
     def _get_ask(self, d0: int, d1: int, liquidity: float, sqrt: float, bid: float):
         d0, d1 = 10 ** d0, 10 ** d1
-        return 1 / abs(((liquidity * ((1 / ((self.SIZE * bid * d1 * (1 - self._FEE) / liquidity) + 1 / (sqrt / 2 ** 96))) - sqrt / 2 ** 96)) / d0) / (self.SIZE * bid))
+        if not self.is_reverse:
+            result = abs(self.SIZE * bid / ((2 ** 96 / sqrt - 1 / (sqrt / 2 ** 96 - self.SIZE * bid * d1 * (1 - self._FEE) / liquidity)) * liquidity / d0))
+        else:
+            result = 1 / abs(((liquidity * ((1 / ((self.SIZE * bid * d1 * (1 - self._FEE) / liquidity) + 1 / (sqrt / 2 ** 96))) - sqrt / 2 ** 96)) / d0) / (self.SIZE * bid))
+        return result
 
     @to_dataframe
     def do(self):
