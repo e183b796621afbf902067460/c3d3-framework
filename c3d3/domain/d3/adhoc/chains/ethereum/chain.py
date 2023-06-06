@@ -18,7 +18,7 @@ class Ethereum:
     API_ENDPOINT = 'https://api.etherscan.io/api'
 
     _LAST_REQ_INT = None
-    _REQ_LIMIT = os.getenv('SCAN_REQ_LIMIT', .2)
+    _REQ_LIMIT = float(os.getenv('SCAN_REQ_LIMIT', .2))
 
     def __str__(self) -> str:
         return __class__.__name__
