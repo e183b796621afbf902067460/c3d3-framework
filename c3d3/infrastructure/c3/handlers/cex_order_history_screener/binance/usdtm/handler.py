@@ -38,6 +38,7 @@ class BinanceUsdtmCexOrderHistoryScreenerHandler(BinanceUsdtmExchange, iCexOrder
         update_ts = datetime.datetime.fromtimestamp(json_['updateTime'] / 10 ** 3)
         return {
             self._EXCHANGE_COLUMN: self.key,
+            self._LABEL_COLUMN: self.label,
             self._TICKER_COLUMN: self.ticker,
             self._MARKET_PRICE_COLUMN: float(json_['avgPrice']) if json_['type'] == 'MARKET' else None,
             self._LIMIT_PRICE_COLUMN: float(json_['price']) if json_['type'] == 'LIMIT' else None,
